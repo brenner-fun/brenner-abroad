@@ -658,6 +658,17 @@ function buildSlides(){
   setInterval(()=>{if(document.visibilityState!=="visible")return;i=(i+1)%imgs.length;show(i)},8000);
 }
 
+/* ---------- continuous scroll: sections ease in as they arrive, the hero photo drifts under the page ---------- */
+function reveals(){
+  if(REDUCED||!("IntersectionObserver" in window))return;
+  const els=[...document.querySelectorAll(".note-wrap, .chapter .ch-open")];
+  els.forEach(e=>e.classList.add("rv"));
+  const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add("in");io.unobserve(x.target)}}),{threshold:.06,rootMargin:"0px 0px -5% 0px"});
+  els.forEach(e=>io.observe(e));
+  const slides=document.getElementById("slides"); let tick=false;
+  addEventListener("scroll",()=>{if(tick)return;tick=true;requestAnimationFrame(()=>{slides.style.transform=`translateY(${Math.min(600,scrollY)*.3}px)`;tick=false})},{passive:true});
+}
+
 /* ---------- the stops: a band and a photo each; tap one for the home base and the sights ---------- */
 function renderChapters2(){
   const host=document.getElementById("chapters"); if(!host)return;
