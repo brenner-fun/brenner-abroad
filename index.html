@@ -80,8 +80,8 @@
   .sol-head{display:flex;justify-content:space-between;gap:10px;padding:10px 14px 0}
   .plate{font-family:var(--f-mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--sol-lab);white-space:nowrap}
   .sol-scroll{container-type:inline-size;overflow-x:auto;padding:10px 12px 12px;scrollbar-color:#5A5048 transparent}
-  /* tiles grow to fill the board, 22 tiles plus 2 column gaps, and shrink to 12px before the board scrolls sideways */
-  @supports (width:1cqw){.sol-scroll{--tw:clamp(12px,calc((100cqw - 2*var(--cg) - 20px)/22),26px);--th:calc(var(--tw)*1.36)}}
+  /* tiles grow to fill the board, 21 tiles plus 3 column gaps, and shrink to 12px before the board scrolls sideways */
+  @supports (width:1cqw){.sol-scroll{--tw:clamp(12px,calc((100cqw - 3*var(--cg) - 20px)/21),26px);--th:calc(var(--tw)*1.36)}}
   .sol-cols,.sol-row{display:flex;gap:var(--cg);width:max-content}
   .sol-cols{padding:0 0 6px}
   .sol-cols span{font-family:var(--f-mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--sol-lab);padding-left:2px;flex:none}
@@ -590,20 +590,20 @@ const REDUCED=matchMedia("(prefers-reduced-motion: reduce)").matches;
 // like a real board, a letter tile only carries letters and a number tile only digits; colons are printed, not flipped
 const LETTERS=" ABCDEFGHIJKLMNOPQRSTUVWXYZ", DIGITS=" 0123456789";
 const setFor=ch=>/[0-9]/.test(ch)?DIGITS:/[A-Z]/.test(ch)?LETTERS:ch==="+"?DIGITS+"+":(ch==="/"||ch==="'")?LETTERS+ch:null;
-const COLS=[{k:"date",w:6,l:"Date"},{k:"from",w:8,l:"From"},{k:"to",w:8,l:"To"}];
+const COLS=[{k:"mon",w:3,l:"Date"},{k:"day",w:2,l:""},{k:"from",w:8,l:"From"},{k:"to",w:8,l:"To"}];
 const LEGS=[
- {date:"11 Nov",from:"Honolulu",to:"Narita"},
- {date:"13 Nov",from:"Narita",to:"Shanghai"},
- {date:"19 Nov",from:"Shanghai",to:"Xi'an"},
- {date:"22 Nov",from:"Xi'an",to:"Beijing"},
- {date:"27 Nov",from:"Beijing",to:"Tokyo"},
- {date:" 6 Dec",from:"Tokyo",to:"Honolulu"}];
+ {mon:"Nov",day:"11",from:"Honolulu",to:"Narita"},
+ {mon:"Nov",day:"13",from:"Narita",to:"Shanghai"},
+ {mon:"Nov",day:"19",from:"Shanghai",to:"Xi'an"},
+ {mon:"Nov",day:"22",from:"Xi'an",to:"Beijing"},
+ {mon:"Nov",day:"27",from:"Beijing",to:"Tokyo"},
+ {mon:"Dec",day:" 6",from:"Tokyo",to:"Honolulu"}];
 
 const tileHTML=ch=>`<span class="tile" data-t="${esc(ch)}"><span class="hf hi"><i> </i></span><span class="hf lo"><i> </i></span><span class="hf fp"><i> </i></span></span>`;
 function buildBoard(){
   const host=document.getElementById("solari"),cols=document.getElementById("sol-cols"),tb=document.querySelector("#sol-table tbody");
   cols.innerHTML=COLS.map(c=>`<span style="width:calc(${c.w}*var(--tw) + ${c.w-1}px)">${c.l}</span>`).join("");
-  tb.innerHTML=LEGS.map(r=>`<tr>${COLS.map(c=>`<td>${esc(r[c.k]||"—")}</td>`).join("")}</tr>`).join("");
+  tb.innerHTML=LEGS.map(r=>`<tr><td>${esc(r.mon+" "+r.day.trim())}</td><td>${esc(r.from)}</td><td>${esc(r.to)}</td></tr>`).join("");
   host.innerHTML=LEGS.map((r,ri)=>`<div class="sol-row${ri===0?" first":""}">${COLS.map(c=>{
     const v=(r[c.k]||"").toUpperCase().padEnd(c.w).slice(0,c.w);
     return `<div class="sol-cell">${[...v].map(tileHTML).join("")}</div>`}).join("")}</div>`).join("");
