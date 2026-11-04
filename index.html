@@ -1,0 +1,691 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Brenner Abroad</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&family=Archivo+Narrow:wght@700&family=Caveat:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@900&text=%E6%88%90%E7%94%B0%E4%B8%8A%E6%B5%B7%E8%A5%BF%E5%AE%89%E5%8C%97%E4%BA%AC%E6%9D%B1&display=swap">
+<style>
+  /* Layout: departure board up top, then a scroll story. A sticky route map draws the line as each city's chapter scrolls past. */
+  :root{
+    --bg:#F4F6FB; --surface:#FFFFFF; --surface-2:#ECEFF7; --ink:#14152B; --ink-2:#3B3E5C; --ink-3:#686B8A; --line:#D9DDEB;
+    --sea:#CFE2F2; --land:#FFFFFF; --land-cn:#FFF1DD; --border:#A9BCD3;
+    --board:#121428; --board-2:#1C1F3A; --board-fg:#FFC83D; --board-dim:#9195B8; --board-ok:#5BE3A1;
+    --narita-band:#D93A23; --shanghai-band:#0A84B8; --xian-band:#C4561A; --beijing-band:#B50E2A; --tokyo-band:#F2B705;
+    --narita:#C7341E; --shanghai:#00739E; --xian:#A84A12; --beijing:#B50E2A; --tokyo:#946600;
+    --pick:#0E7A55; --pick-soft:#D5F2E4;
+    --shadow:0 1px 2px rgba(20,21,43,.06),0 18px 40px -24px rgba(20,21,43,.45);
+    --f-display:"Big Shoulders Display","Arial Narrow","Helvetica Neue",sans-serif;
+    --f-body:Figtree,"Segoe UI",system-ui,sans-serif;
+    --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+    --f-cjk:"Noto Serif SC","Songti SC","STSong",serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0D0F1F; --surface:#161935; --surface-2:#1E2244; --ink:#EEF0FA; --ink-2:#C3C7E1; --ink-3:#8F93B4; --line:#2A2F55;
+      --sea:#0E1A31; --land:#1B2040; --land-cn:#2B2340; --border:#3B4672;
+      --narita:#FF7A5E; --shanghai:#3CC3F0; --xian:#F59A5C; --beijing:#FF6B78; --tokyo:#FFC93C;
+      --pick:#5BE3A1; --pick-soft:#123A2B;
+      --shadow:0 1px 2px rgba(0,0,0,.5),0 18px 40px -22px rgba(0,0,0,.9);
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0D0F1F; --surface:#161935; --surface-2:#1E2244; --ink:#EEF0FA; --ink-2:#C3C7E1; --ink-3:#8F93B4; --line:#2A2F55;
+    --sea:#0E1A31; --land:#1B2040; --land-cn:#2B2340; --border:#3B4672;
+    --narita:#FF7A5E; --shanghai:#3CC3F0; --xian:#F59A5C; --beijing:#FF6B78; --tokyo:#FFC93C;
+    --pick:#5BE3A1; --pick-soft:#123A2B;
+    --shadow:0 1px 2px rgba(0,0,0,.5),0 18px 40px -22px rgba(0,0,0,.9);
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+  .gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .inner{max-width:1240px;margin:0 auto}
+  p{margin:0 0 .85em}
+  a{color:inherit}
+  button{font:inherit;color:inherit}
+  :focus-visible{outline:3px solid var(--shanghai);outline-offset:2px}
+  .narita{--band:var(--narita-band);--acc:var(--narita);--on:#FFFFFF}
+  .shanghai{--band:var(--shanghai-band);--acc:var(--shanghai);--on:#FFFFFF}
+  .xian{--band:var(--xian-band);--acc:var(--xian);--on:#FFFFFF}
+  .beijing{--band:var(--beijing-band);--acc:var(--beijing);--on:#FFFFFF}
+  .tokyo{--band:var(--tokyo-band);--acc:var(--tokyo);--on:#14152B}
+
+  /* ---------- hero: the title over a slow slideshow of the cities, with a small split-flap board beneath it ---------- */
+  .hero{position:relative;background:#171512;min-height:min(88vh,820px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(18px,3.5vh,34px);padding-block:clamp(56px,10vh,120px) clamp(56px,9vh,96px);overflow:hidden}
+  .slides{position:absolute;inset:-8% 0;will-change:transform}
+  /* each slide zooms for exactly as long as it is shown, then holds that zoom while it fades, so nothing snaps */
+  .slides img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 2.8s ease-in-out;will-change:opacity,transform;transform:scale(1)}
+  .slides img.on{opacity:1;animation:kb 8s linear forwards}
+  .slides img.off{transform:scale(1.07)}
+  @keyframes kb{from{transform:scale(1)}to{transform:scale(1.07)}}
+  .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,11,9,.42) 0%,rgba(14,11,9,.38) 45%,rgba(14,11,9,.7) 100%);pointer-events:none}
+  .hero-title{position:relative;z-index:1;font-family:var(--f-display);font-weight:900;font-size:clamp(64px,15vw,168px);line-height:.86;letter-spacing:.01em;text-transform:uppercase;color:#FFFFFF;text-align:center;margin:0;padding-inline:16px;text-wrap:balance;text-shadow:0 6px 36px rgba(0,0,0,.6)}
+  .hero .inner{position:relative;z-index:1;width:100%;max-width:560px;margin:0}
+  .credits{font-family:var(--f-mono);font-size:10.5px;color:var(--ink-3);margin:6px 0 0;line-height:1.6}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  /* a handwritten note on lined paper, taped under the board */
+  .note-wrap{position:relative;z-index:1;width:100%;max-width:460px;padding-inline:20px;margin-top:6px}
+  .note{position:relative;background:#FBF5E4;color:#2A2420;padding:24px 22px 18px;border-radius:2px;transform:rotate(-1.4deg);box-shadow:0 22px 44px -18px rgba(0,0,0,.75),0 2px 4px rgba(0,0,0,.25);background-image:repeating-linear-gradient(transparent 0 29px,rgba(70,90,130,.16) 29px 30px);background-position:0 18px}
+  .note::before{content:"";position:absolute;top:-13px;left:50%;width:118px;height:28px;margin-left:-59px;background:rgba(255,241,190,.55);border:1px solid rgba(255,255,255,.35);transform:rotate(-2.5deg);box-shadow:0 1px 3px rgba(0,0,0,.18)}
+  .dek{font-family:Caveat,"Bradley Hand","Segoe Print",cursive;font-size:24px;line-height:30px;margin:0;color:#2A2420;white-space:pre-line;font-weight:500}
+  @media (max-width:600px){.note-wrap{max-width:100%;padding-inline:16px}.note{padding:22px 18px 16px}}
+
+  /* ---------- split-flap departures board ---------- */
+  .solari{--tw:16px;--th:21px;--cg:10px;--f-flap:"Archivo Narrow","Arial Narrow","Helvetica Neue",sans-serif;--sol-house:#171512;--sol-frame:#3D362E;--sol-fg:#FFFCF2;--sol-lab:#C9B88F;color:var(--sol-fg)}
+  .sol-house{background:var(--sol-house);border:3px solid var(--sol-frame);border-radius:7px;box-shadow:inset 0 0 0 1px #080706,inset 0 30px 60px -40px rgba(0,0,0,.9),0 30px 60px -30px rgba(0,0,0,.95);overflow:hidden}
+  .sol-head{display:flex;justify-content:space-between;gap:10px;padding:10px 14px 0}
+  .plate{font-family:var(--f-mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--sol-lab);white-space:nowrap}
+  .sol-scroll{container-type:inline-size;overflow-x:auto;padding:10px 12px 12px;scrollbar-color:#5A5048 transparent}
+  /* tiles grow to fill the board, 22 tiles plus 2 column gaps, and shrink to 12px before the board scrolls sideways */
+  @supports (width:1cqw){.sol-scroll{--tw:clamp(12px,calc((100cqw - 2*var(--cg) - 20px)/22),26px);--th:calc(var(--tw)*1.36)}}
+  .sol-cols,.sol-row{display:flex;gap:var(--cg);width:max-content}
+  .sol-cols{padding:0 0 6px}
+  .sol-cols span{font-family:var(--f-mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--sol-lab);padding-left:2px;flex:none}
+  .sol-row{padding:6px 0;border-top:1px solid #090807}
+  .sol-row.first{border-top:0}
+  .sol-cell{display:flex;gap:1px}
+  .tile{position:relative;width:var(--tw);height:var(--th);border-radius:1.5px;background:#0B0B0D;font-family:var(--f-flap);font-weight:700;font-size:calc(var(--th)*.94);letter-spacing:-.01em;color:var(--sol-fg);text-transform:uppercase;perspective:140px;flex:none}
+  .hf{position:absolute;left:0;right:0;height:50%;overflow:hidden;background:#1C1C20}
+  .hf i{position:absolute;left:0;right:0;height:var(--th);line-height:var(--th);text-align:center;font-style:normal}
+  .hi{top:0;border-radius:1.5px 1.5px 0 0}
+  .hi i{top:0}
+  .lo{bottom:0;border-radius:0 0 1.5px 1.5px;background:#18181C}
+  .lo i{bottom:0}
+  .fp{top:0;border-radius:1.5px 1.5px 0 0;transform-origin:50% 100%;backface-visibility:hidden}
+  .fp i{top:0}
+  .tile.go .fp{animation:flap 70ms ease-in both}
+  @keyframes flap{from{transform:rotateX(0)}to{transform:rotateX(-88deg)}}
+  .tile::after{content:"";position:absolute;left:0;right:0;top:calc(50% - .5px);height:1px;background:#000;z-index:3}
+
+  /* ---------- continuous scroll: things ease in as they arrive ---------- */
+  .rv{opacity:0;transform:translateY(22px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+  .rv.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none}}
+
+  /* ---------- the stops: poster cards that stack as you scroll; tap one to open the detail panel ---------- */
+  .inner.journey{padding-block:30px 40px}
+  .chapters{display:flex;flex-direction:column;gap:20px}
+  main .chapter{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);padding-bottom:0}
+  .ch-open{position:relative;display:block;width:100%;aspect-ratio:4/5;max-height:76vh;padding:0;border:0;border-radius:16px;overflow:hidden;background:var(--band);color:#FFFFFF;cursor:pointer;box-shadow:0 34px 60px -28px rgba(0,0,0,.75);transition:transform .45s cubic-bezier(.2,.7,.2,1);font:inherit;text-align:left}
+  @media (min-width:700px){.ch-open{aspect-ratio:16/9;max-height:620px}}
+  .ch-open:hover{transform:translateY(-4px)}
+  .ch-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+  .ch-open:hover .ch-img{transform:scale(1.05)}
+  .ch-open::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.06) 30%,rgba(0,0,0,.62) 100%)}
+  @supports (color:color-mix(in srgb,red,blue)){.ch-open::after{background:linear-gradient(180deg,rgba(0,0,0,0) 32%,color-mix(in srgb,var(--band) 55%,rgba(0,0,0,.85)) 100%)}}
+  .ch-kanji{position:absolute;z-index:1;top:6px;right:14px;font-family:var(--f-cjk);font-weight:900;font-size:clamp(110px,30vw,240px);line-height:.92;letter-spacing:-.04em;color:#FFFFFF;opacity:.32;pointer-events:none}
+  .ch-meta{position:absolute;z-index:1;left:20px;right:88px;bottom:20px;text-shadow:0 2px 16px rgba(0,0,0,.55)}
+  .ch-meta .num{display:block;font-family:var(--f-mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.85}
+  .ch-meta h2{font-family:var(--f-display);font-weight:900;font-size:clamp(46px,11vw,96px);line-height:.88;text-transform:uppercase;margin:4px 0 6px;color:#FFFFFF}
+  .ch-meta .when{display:block;font-family:var(--f-mono);font-size:12px;opacity:.92}
+  .ch-more{position:absolute;z-index:1;right:18px;bottom:20px;width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1.5px solid rgba(255,255,255,.75);color:#FFFFFF;font-size:30px;font-weight:300;line-height:47px;text-align:center;transition:transform .35s cubic-bezier(.2,.7,.2,1),background .35s,color .35s}
+  .ch-open:hover .ch-more{background:#FFFFFF;color:#14152B;transform:rotate(90deg)}
+  dialog.detail{border:0;padding:0;background:var(--surface);color:var(--ink);width:min(780px,94vw);max-height:90vh;border-radius:8px;box-shadow:var(--shadow);overflow:auto;overscroll-behavior:contain}
+  dialog.detail::backdrop{background:rgba(8,10,24,.8)}
+  dialog.detail .band{border-radius:8px 8px 0 0;position:sticky;top:0;z-index:2}
+  .dt-close{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(0,0,0,.28);color:inherit;font-size:24px;line-height:36px;text-align:center;cursor:pointer;padding:0}
+  .dt-body{padding:18px 20px 26px}
+  .dt-body .lede{font-size:17px;margin-bottom:14px}
+  .dt-stay{margin:20px 0 0;padding-top:14px;border-top:1px solid var(--line);font-family:var(--f-mono);font-size:12.5px;line-height:1.6;color:var(--ink-2)}
+  .dt-stay b{color:var(--ink);font-weight:600}
+  .dt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+  @media (max-width:600px){.dt-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.dt-body{padding:14px 14px 22px}}
+
+  /* ---------- phone proportions: this page is mostly shared on phones ---------- */
+  @media (max-width:600px){
+    .hero{min-height:min(92vh,760px);gap:22px;padding-block:72px 60px}
+    .hero-title{font-size:clamp(60px,19vw,88px)}
+    .chapter .band .cjk{font-size:58px}
+    .chapter .band h2{font-size:38px}
+    .chapter .band .when{font-size:12px}
+    .chapter .band{padding:16px 16px 14px;gap:4px}
+    main .chapter{padding-bottom:44px}
+    .ch-body .lede{font-size:17px}
+    .inner.journey{padding-block:22px 0}
+    .chapter h3.sub{font-size:21px;margin:22px 0 8px}
+    .now .map-title h2{font-size:28px}
+  }
+
+  /* ---------- journey layout ---------- */
+  .journey{padding-block:40px 0}.chapters{max-width:980px;margin:0 auto}
+  .now{padding-block:44px 24px;border-top:1px solid var(--line);margin-top:10px}.now .wrap{max-width:880px}.now .now-at{margin:0 0 14px}.now-at.home{--band:var(--board);--acc:var(--ink)}
+  
+  .map-card{background:var(--sea);border-radius:6px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line)}
+  .map-card svg{display:block;width:100%;height:auto}
+  .map-title{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0 0 10px}
+  .map-title h2{font-family:var(--f-display);font-weight:800;text-transform:uppercase;font-size:30px;line-height:1;margin:0;letter-spacing:.01em}
+  .map-title span{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3)}.map-title h2{font-size:clamp(28px,4vw,40px)}
+  .land path{fill:var(--land);stroke:var(--border);stroke-width:.9;stroke-linejoin:round}
+  .land path.cn{fill:var(--land-cn)}
+  .ctry{font-family:var(--f-mono);font-size:12px;letter-spacing:.34em;fill:var(--ink-3)}
+  .leg-base{fill:none;stroke:var(--ink-3);stroke-width:2;opacity:.35;stroke-linecap:round}
+  .leg-base.fly{stroke-dasharray:2 6}
+  .leg-prog{fill:none;stroke:var(--ink);stroke-width:3.4;stroke-linecap:round}
+  .leglab{font-family:var(--f-mono);font-size:11px;fill:var(--ink-2);paint-order:stroke;stroke:var(--sea);stroke-width:4px;stroke-linejoin:round}
+  .city{cursor:pointer}
+  .city .ring{fill:var(--band);opacity:0;transition:opacity .3s, r .3s}
+  .city.on .ring{opacity:.28}
+  .city .dot{fill:var(--band);stroke:var(--land);stroke-width:3;transition:r .3s}
+  .city text{font-family:var(--f-display);font-weight:800;font-size:19px;text-transform:uppercase;fill:var(--ink);paint-order:stroke;stroke:var(--sea);stroke-width:5px;stroke-linejoin:round;letter-spacing:.02em}
+  .city text.sub{font-family:var(--f-mono);font-weight:400;font-size:11px;text-transform:none;fill:var(--ink-3)}
+  .city.on text:not(.sub){fill:var(--acc)}
+  .map-key{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:4px 16px;margin-top:10px}
+  .map-key span{display:inline-flex;gap:6px;align-items:center}
+  .now-at{margin-top:14px;display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+  .now-at .cjk-sm{font-family:var(--f-cjk);font-weight:900;font-size:30px;line-height:1;color:var(--acc)}
+  .now-at b{font-family:var(--f-display);text-transform:uppercase;font-size:20px;letter-spacing:.02em;display:block;line-height:1.05}
+  .now-at small{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3)}
+  
+
+  /* mobile route strip */
+  .strip{display:none}
+  @media (max-width:1000px){
+    .strip{display:flex;position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line);margin:22px calc(-1*max(16px,env(safe-area-inset-left,0px))) 0;padding:8px max(16px,env(safe-area-inset-left,0px));gap:4px;overflow-x:auto}
+    .strip button{flex:1 0 auto;border:0;background:transparent;font-family:var(--f-display);font-weight:800;text-transform:uppercase;font-size:15px;letter-spacing:.03em;color:var(--ink-3);padding:6px 8px;border-bottom:3px solid transparent;cursor:pointer}
+    .strip button.on{color:var(--acc);border-bottom-color:var(--band)}
+  }
+
+  /* ---------- chapters ---------- */
+  .chapter{padding-bottom:72px;scroll-margin-top:calc(env(safe-area-inset-top,0px) + 64px)}
+  .band{background:var(--band);color:var(--on);border-radius:6px 6px 0 0;padding:20px 22px 18px;display:flex;gap:18px;align-items:flex-end;position:relative;overflow:hidden}
+  .band .cjk{font-family:var(--f-cjk);font-weight:900;font-size:clamp(70px,11vw,118px);line-height:.85;opacity:.95;flex:none;letter-spacing:-.02em}
+  .band .num{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;opacity:.85;margin:0 0 4px}
+  .band h2{font-family:var(--f-display);font-weight:900;font-size:clamp(46px,7vw,76px);line-height:.88;text-transform:uppercase;margin:0;letter-spacing:.005em}
+  .band .when{font-family:var(--f-mono);font-size:13px;margin:8px 0 0;opacity:.95}
+  @media (max-width:520px){.band{flex-direction:column;align-items:flex-start;gap:6px}}
+  .ch-hero{margin:0;position:relative;background:var(--surface-2)}
+  .ch-hero button{display:block;width:100%;padding:0;border:0;cursor:zoom-in;background:none}
+  .ch-hero img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;max-width:100%}
+  .ch-hero figcaption{position:absolute;left:0;bottom:0;right:0;padding:24px 14px 10px;font-size:13px;color:#FFFFFF;background:linear-gradient(180deg,transparent,rgba(8,10,24,.75));pointer-events:none}
+  .ch-body{background:var(--surface);border:1px solid var(--line);border-top:0;border-radius:0 0 6px 6px;padding:22px 22px 26px;box-shadow:var(--shadow)}
+  @media (max-width:520px){.ch-body,.band{padding-left:16px;padding-right:16px}}
+  .lede{font-size:clamp(18px,2vw,20px);line-height:1.5;color:var(--ink);max-width:56ch}
+  .tickets{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:18px 0 6px}
+  .ticket{border:1.5px dashed var(--acc);border-radius:6px;padding:12px 14px;position:relative;background:var(--surface)}
+  .ticket .lbl{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--acc);margin:0 0 4px}
+  .ticket strong{font-family:var(--f-display);font-weight:800;font-size:23px;text-transform:uppercase;line-height:1;display:block;letter-spacing:.01em}
+  .ticket .zh{font-size:14px;color:var(--ink-2);margin-top:4px}
+  .ticket .facts{font-family:var(--f-mono);font-size:12px;color:var(--ink-3);margin-top:6px;line-height:1.5}
+  .ticket ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+  .ticket li{font-family:var(--f-mono);font-size:12.5px;color:var(--ink-2);line-height:1.45}
+  .ticket li b{color:var(--ink)}
+  .badge{font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:2px;display:inline-block;vertical-align:3px;margin-left:6px}
+  .badge.ok{background:var(--pick-soft);color:var(--pick)}
+  .badge.todo{background:var(--surface-2);color:var(--ink-2)}
+  h3.sub{font-family:var(--f-display);font-weight:800;text-transform:uppercase;font-size:24px;letter-spacing:.02em;margin:26px 0 10px;display:flex;align-items:center;gap:12px}
+  h3.sub::after{content:"";flex:1;height:2px;background:var(--band);opacity:.5}
+
+  /* gallery */
+  .gallery{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(220px,42%);gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:10px;margin-inline:-4px;padding-inline:4px}
+  @media (max-width:520px){.gallery{grid-auto-columns:78%}}
+  .card{scroll-snap-align:start;background:var(--surface-2);border-radius:6px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+  .card button{padding:0;border:0;background:none;cursor:zoom-in;display:block;overflow:hidden}
+  .card img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;transition:transform .5s}
+  .card:hover img{transform:scale(1.06)}
+  .card .txt{padding:10px 12px 12px}
+  .card b{font-weight:700;font-size:15.5px;display:block;line-height:1.25}
+  .card small{display:block;font-size:13px;color:var(--ink-3);margin-top:3px;line-height:1.35}
+  .tag{font-family:var(--f-mono);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border-radius:2px;display:inline-block;margin-bottom:6px}
+  .tag.must{background:var(--band);color:var(--on)}
+  .tag.maybe{border:1.5px solid var(--acc);color:var(--acc);padding:1px 5px}
+  .tag.book{border:1.5px solid var(--ink-3);color:var(--ink-2);padding:1px 5px}
+  .swipe{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);margin:2px 0 0}
+
+  /* neighbourhood map */
+  .nbhd{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px;margin-top:6px}
+  @media (max-width:700px){.nbhd{grid-template-columns:minmax(0,1fr)}}
+  .citymap{background:var(--land);border:1px solid var(--line);border-radius:6px;overflow:hidden;max-width:100%}
+  .citymap svg{display:block;width:100%;height:auto}
+  .cm-shape{fill:none;stroke:var(--border);stroke-width:2}
+  .cm-shape.water{stroke:var(--sea);stroke-width:10;stroke-linecap:round;stroke-linejoin:round}
+  .cm-shape.area{fill:var(--surface-2);stroke:var(--border);stroke-width:1.5;stroke-dasharray:5 4}
+  .cm-shape.solid{fill:var(--land-cn);stroke:var(--border);stroke-width:1.5}
+  .cm-lab{font-family:var(--f-mono);font-size:10.5px;fill:var(--ink-3);letter-spacing:.06em}
+  .pt{cursor:pointer}
+  .pt circle{stroke:var(--land);stroke-width:2}
+  .pt.must circle{fill:var(--band)}
+  .pt.maybe circle{fill:var(--land);stroke:var(--acc);stroke-width:2.4}
+  .pt text{font-family:var(--f-mono);font-size:11px;font-weight:600;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+  .pt.must text{fill:var(--on)}
+  .pt.maybe text{fill:var(--acc)}
+  .pt.hot circle{stroke:var(--ink);stroke-width:3}
+  .home rect{fill:var(--ink);stroke:var(--land);stroke-width:2}
+  .home text{fill:var(--land);font-family:var(--f-display);font-weight:800;font-size:14px;text-anchor:middle;dominant-baseline:central}
+  .stn rect{fill:var(--land);stroke:var(--ink-3);stroke-width:1.3}
+  .stn text{fill:var(--ink-3);font-family:var(--f-mono);font-size:9px;font-weight:600;text-anchor:middle;dominant-baseline:central}
+  .scale line{stroke:var(--ink-3);stroke-width:1.5}
+  .scale text{font-family:var(--f-mono);font-size:10px;fill:var(--ink-3)}
+  .legend{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1px}
+  .legend li{display:flex;gap:9px;align-items:flex-start;font-size:14px;line-height:1.3;padding:4px 6px;border-radius:4px;color:var(--ink-2)}
+  .legend li.hot{background:var(--surface-2)}
+  .legend .n{flex:none;width:21px;height:21px;border-radius:50%;font-family:var(--f-mono);font-size:10.5px;font-weight:600;display:grid;place-items:center}
+  .legend .must .n{background:var(--band);color:var(--on)}
+  .legend .maybe .n{border:2px solid var(--acc);color:var(--acc)}
+  .legend .h .n{background:var(--ink);color:var(--land);border-radius:3px;font-family:var(--f-display);font-size:13px}
+  .legend small{display:block;font-size:12px;color:var(--ink-3)}
+  .off{list-style:none;margin:10px 0 0;padding:10px 0 0;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+  .off li{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3);line-height:1.4}
+  .off li b{color:var(--ink-2)}
+
+  /* days */
+  .days{list-style:none;margin:0;padding:0;position:relative}
+  .days::before{content:"";position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:var(--band);opacity:.35}
+  .days > li{position:relative;padding:0 0 16px 30px}
+  .days > li::before{content:"";position:absolute;left:1px;top:6px;width:14px;height:14px;border-radius:50%;background:var(--surface);border:3px solid var(--band)}
+  .d-when{font-family:var(--f-mono);font-size:12px;font-weight:600;color:var(--acc);letter-spacing:.04em;text-transform:uppercase}
+  .d-when em{font-style:normal;font-weight:400;color:var(--ink-3)}
+  .days h4{font-size:17px;margin:2px 0 4px;font-weight:700;line-height:1.3}
+  .days ul{margin:0;padding-left:18px}
+  .days ul li{font-size:15px;color:var(--ink-2);margin-bottom:3px}
+  .days ul li .tag{margin:0 0 0 6px;vertical-align:1px}
+  .travel{font-family:var(--f-mono);font-size:12.5px;background:var(--surface-2);border-left:3px solid var(--band);padding:6px 10px;margin:4px 0 6px;display:inline-block;color:var(--ink)}
+
+  /* ---------- planning desk ---------- */
+  .desk{padding-block:56px 30px;border-top:1px solid var(--line);margin-top:20px}
+  .desk h2{font-family:var(--f-display);font-weight:900;text-transform:uppercase;font-size:clamp(38px,5vw,56px);line-height:.9;margin:0 0 8px}
+  .desk .note{color:var(--ink-3);font-size:15px;max-width:62ch}
+  .share-btn{font-family:var(--f-mono);font-size:12.5px;border:1.5px solid var(--ink);background:transparent;padding:7px 12px;border-radius:3px;cursor:pointer}
+  .share-btn:hover{background:var(--ink);color:var(--bg)}
+  .todo{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px;margin:18px 0 28px}
+  .todo div{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px 14px}
+  .todo strong{display:block;font-size:15px}
+  .todo small{display:block;font-size:13.5px;color:var(--ink-3);line-height:1.4;margin-top:2px}
+  .todo .when{font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:2px;display:inline-block;margin-bottom:6px}
+  .todo .w-ok{background:var(--pick-soft);color:var(--pick)}
+  .todo .w-now{background:var(--beijing-band);color:#FFFFFF}
+  .todo .w-later{background:var(--surface-2);color:var(--ink-2)}
+  .tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+  table.money{border-collapse:collapse;width:100%;min-width:520px;font-size:15px}
+  .money th{text-align:left;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:400;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+  .money td{padding:9px 14px;border-bottom:1px solid var(--line);color:var(--ink-2)}
+  .money tr:last-child td{border-bottom:0}
+  .money td.num,.money th.num{text-align:right;white-space:nowrap}
+  .money td.num{font-family:var(--f-mono);color:var(--ink);font-variant-numeric:tabular-nums}
+  .money tr.sub td{background:var(--surface-2);font-weight:600;color:var(--ink)}
+  .money tr.total td{background:var(--pick-soft);font-weight:700;color:var(--ink)}
+  .later{margin-top:26px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px 18px}
+  .later p:last-child{margin:0}
+  footer{padding-block:26px 50px;font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3);border-top:1px solid var(--line)}
+  body.share .private{display:none!important}
+  .share-banner{display:none}
+  body.share .share-banner{display:block;background:var(--board);color:var(--board-fg);font-family:var(--f-mono);font-size:12px;text-align:center;padding:8px 16px}
+  body.share .share-banner button{background:none;border:0;color:var(--board-fg);text-decoration:underline;cursor:pointer;font-size:12px}
+
+  /* ---------- viewer ---------- */
+  dialog#viewer{border:0;padding:0;background:var(--surface);color:var(--ink);max-width:min(1100px,94vw);width:100%;border-radius:6px;box-shadow:var(--shadow)}
+  dialog#viewer::backdrop{background:rgba(8,10,24,.85)}
+  #viewer img{display:block;width:100%;max-height:74vh;object-fit:contain;background:#080A18}
+  .v-bar{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:10px 14px;flex-wrap:wrap}
+  .v-cap{font-size:15px;font-weight:600}
+  .v-cap small{display:block;font-family:var(--f-mono);font-size:11px;color:var(--ink-3);font-weight:400}
+  .v-btns{display:flex;gap:6px}
+  .v-btns button{font-family:var(--f-mono);font-size:12px;background:var(--surface-2);border:1px solid var(--line);padding:6px 10px;cursor:pointer;border-radius:3px}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+
+
+<header class="hero solari">
+  <div class="slides" id="slides" aria-hidden="true"></div>
+  <h1 class="hero-title">Brenner <wbr>Abroad</h1>
+  <div class="inner gut">
+    <div class="sol-house">
+      <div class="sol-head"><span class="plate">Departures</span><span class="plate">Nov – Dec 2026</span></div>
+      <div class="sol-scroll">
+        <div class="sol-cols" id="sol-cols" aria-hidden="true"></div>
+        <div id="solari" aria-hidden="true"></div>
+      </div>
+      <table class="sr" id="sol-table"><caption>Flights and trains</caption><thead><tr><th>Date</th><th>From</th><th>To</th></tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+  <div class="note-wrap">
+    <div class="note">
+      <p class="dek" id="intro"><!--intro-->Thanks for checking out this page and following along!
+
+PS: if I get kidnapped use this to find me pls &lt;3<!--/intro--></p>
+    </div>
+  </div>
+</header>
+
+<dialog id="detail" class="detail" aria-label="Stop details"></dialog>
+
+<main class="gut">
+  <div class="inner journey">
+    
+
+    <div class="chapters">
+      <nav class="strip" id="strip" aria-label="Jump to a stop"></nav>
+      <div id="chapters"></div>
+    </div>
+  </div>
+</main>
+
+
+
+<footer class="gut"><div class="inner">Nov 2026 · Stop photos from Wikimedia Commons, credited in the photo viewer.<p class="credits" id="credits"></p></div></footer>
+
+<dialog id="viewer" aria-label="Photo viewer">
+  <img id="v-img" alt="">
+  <div class="v-bar">
+    <div class="v-cap" id="v-cap"></div>
+    <div class="v-btns"><button type="button" id="v-prev">← Prev</button><button type="button" id="v-next">Next →</button><button type="button" id="v-close">Close</button></div>
+  </div>
+</dialog>
+
+<script>
+const CITY_XY = {"narita": [839.7, 225.9], "shanghai": [415.6, 350.8], "xian": [133.6, 267.5], "beijing": [301.5, 112.3], "tokyo": [825.7, 228.5]};
+const PHOTOS = {"shanghai-skyline": {"cap": "The Pudong skyline from the Bund", "by": "DvTor8303", "lic": "CC0", "page": "https://commons.wikimedia.org/w/index.php?curid=190229393"}, "beijing-1": {"cap": "The Forbidden City from Jingshan hill", "by": "Ermell", "lic": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:Peking_verbotene_Stadt-20071018-RM-162900.jpg"}, "beijing-2": {"cap": "The Hall of Prayer for Good Harvests, Temple of Heaven", "by": "Ermell", "lic": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:Peking_Himmelstempel-20110103-RM-160758.jpg"}, "beijing-3": {"cap": "Houhai Lake and the Drum Tower at night", "by": "Morio", "lic": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:Houhai_Lake_and_Drum_Tower_Beijing_2015_October.jpg"}, "beijing-4": {"cap": "A hutong lane", "by": "lyng883", "lic": "CC BY 2.0", "page": "https://commons.wikimedia.org/wiki/File:Beijing_hutong_1.jpg"}, "narita-1": {"cap": "The Great Peace Pagoda at Naritasan Shinshoji", "by": "Guilhem Vellut from Annecy", "lic": "CC BY 2.0", "page": "https://commons.wikimedia.org/wiki/File:Great_Peace_Pagoda_@_Naritasan_Shinshoji_Temple_@_Narita_(15078508129).jpg"}, "narita-2": {"cap": "The three-storey pagoda at Naritasan in evening light", "by": "Guilhem Vellut from Annecy", "lic": "CC BY 2.0", "page": "https://commons.wikimedia.org/wiki/File:3-story_pagoda_@_Naritasan_Shinshoji_Temple_@_Narita_(15077855229).jpg"}, "shanghai-1": {"cap": "Lujiazui lit up at night, seen from the Bund", "by": "Daniel Case", "lic": "CC BY-SA 3.0", "page": "https://commons.wikimedia.org/wiki/File:Lujiazui_skyline_by_night_from_Bund,_fully_illuminated.jpg"}, "shanghai-2": {"cap": "Wukang Mansion in the former French Concession", "by": "N509FZ", "lic": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:Wukang_Mansion_(20191114161507).jpg"}, "shanghai-3": {"cap": "Yu Garden in the old city", "by": "Stefan Fussan", "lic": "CC BY-SA 3.0", "page": "https://commons.wikimedia.org/wiki/File:Shanghai_-_Yu_Garden_-_0035.jpg"}, "shanghai-4": {"cap": "The maglev from Pudong Airport", "by": "kallerna", "lic": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:Shanghai_Maglev_2.jpg"}, "shanghai-fuxing": {"cap": "Fuxing Park in the former French Concession", "by": "Jpbowen", "lic": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:Fuxing_Park,_Shanghai.JPG"}, "shanghai-nanjing": {"cap": "Nanjing Road at night, in November", "by": "Hermann Luyken", "lic": "CC0", "page": "https://commons.wikimedia.org/wiki/File:2014.11.15.181427_Nanjing_Road_Pedestrian_Zone_Shanghai.jpg"}, "shanghai-thames": {"cap": "Thames Town, Songjiang's mock-English town", "by": "Huai-Chun Hsu", "lic": "CC BY 2.0", "page": "https://commons.wikimedia.org/wiki/File:Thames_Town_in_Songjiang_02.jpg"}, "tokyo-1": {"cap": "The ginkgo avenue at Meiji Jingu Gaien in autumn", "by": "Kakidai", "lic": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:Jingu_Gaien_Ginkgo_Street_in_Autumn_5.jpg"}, "tokyo-shibuya": {"cap": "Shibuya Crossing at night", "by": "Joli Rumi", "lic": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:Shibuya_crossing_at_night,_Tokyo,_Japan.jpg"}, "tokyo-shimokita": {"cap": "A side street in Shimokitazawa", "by": "Stephen Kelly from San Francisco, CA, USA", "lic": "CC BY 2.0", "page": "https://commons.wikimedia.org/wiki/File:Dense_Street_in_Shimokitazawa_(11919213554).jpg"}, "wall-1": {"cap": "Watchtowers along the Jinshanling ridge", "by": "Jakub Hałun", "lic": "CC BY-SA 3.0", "page": "https://commons.wikimedia.org/wiki/File:20090529_Great_Wall_8185.jpg"}, "wall-2": {"cap": "The wall climbing toward a tower", "by": "Jakub Hałun", "lic": "CC BY-SA 3.0", "page": "https://commons.wikimedia.org/wiki/File:20090529_Great_Wall_8125.jpg"}, "xian-1": {"cap": "Pit 1 of the Terracotta Army", "by": "Gary Lee Todd, Ph.D.", "lic": "CC0", "page": "https://commons.wikimedia.org/wiki/File:Qin_Terracotta_Warriors,_Pit_1_16.jpg"}, "xian-2": {"cap": "The Ming city wall, which still rings the old centre", "by": "Ideophagous", "lic": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:Xi%27an_city_walls_(89479).jpg"}, "xian-3": {"cap": "The Muslim Quarter's food streets", "by": "Qianeal", "lic": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:Xi%27an_Muslim_Quarter.jpg"}, "xian-4": {"cap": "The Bell Tower at night", "by": "TarnishedPath", "lic": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:Xi%27an_Bell_Tower_at_night.jpg"}, "xian-goose": {"cap": "The Big Wild Goose Pagoda", "by": "Alexey Komarov", "lic": "CC BY-SA 4.0", "page": "https://commons.wikimedia.org/wiki/File:Giant_Wild_Goose_Pagoda,_Xi%27an,_May,_2018-1.jpg"}, "xian-qujiang": {"cap": "Tang-style halls lit up around the lake at Qujiang, the Tang Paradise area", "by": "Charlie fong冯成", "lic": "Public domain", "page": "https://commons.wikimedia.org/wiki/File:XiAn_qujiang.jpg"}};
+const B = "book";
+
+const STOPS = [
+ {id:"narita", cjk:"成田", name:"Narita", dates:"Thu Nov 12 – Fri Nov 13", nights:"1 night", short:"1 night",
+  hero:"narita-2",
+  lede:"First stop is one night in Narita, the little temple town ten minutes from the airport. I want to walk the old street up to Naritasan at dusk, find some grilled eel, and see the temple again at dawn before I fly on to Shanghai.",
+  stay:{name:"Narita hotel", zh:"Near Narita station", facts:"1 night", price:"", status:"ok"},
+  legs:["<b>In</b> ✈ from Honolulu, lands 15:30 Thu", "<b>Out</b> ✈ Narita 15:00 → Shanghai 17:35, Fri"],
+  gallery:[
+    {ph:"narita-1",n:"Naritasan Shinshoji",tag:"must",note:"The big temple at the top of the old street. I'm going at dawn before my flight"},
+    {ph:"narita-2",n:"The three-storey pagoda",tag:"must",note:"The red and gold pagoda in the temple grounds. Hoping for early light"}],
+  map:{points:[
+    {n:"Narita stations (JR and Keisei)",lat:35.7765,lon:140.3157,k:"must",note:"10 min to the airport"},
+    {n:"Omotesando street",lat:35.7808,lon:140.3172,k:"must",note:"Eel shops, old storefronts"},
+    {n:"Naritasan Shinshoji",lat:35.7862,lon:140.3182,k:"must",note:"Temple and pagodas"},
+    {n:"Naritasan Park",lat:35.7878,lon:140.3208,k:"maybe",note:"Autumn colour"}],
+   shapes:[], off:[["Narita Airport T1","about 6 km east, 10 min by train"]]},
+  days:[
+    {w:"Wed Nov 11",e:"Leave",travel:"✈ Honolulu → Narita · United, ANA-operated",items:[["Cross the date line, land Thursday afternoon"]]},
+    {w:"Thu Nov 12",e:"Arrive 15:30",h:"Narita town",items:[["Omotesando, the old street up to the temple, at dusk"],["Dinner at an izakaya near the station"]]},
+    {w:"Fri Nov 13",e:"Fly to China",h:"Temple at dawn",items:[["Naritasan Shinshoji in the early light","must"],["Grilled eel for lunch, then Terminal 1 by 12:30"]],travel2:"✈ Narita 15:00 → Shanghai Pudong 17:35 · Air China"}]},
+
+ {id:"shanghai", cjk:"上海", name:"Shanghai", dates:"Fri Nov 13 – Thu Nov 19", nights:"6 nights", short:"6 nights",
+  hero:"shanghai-skyline",
+  lede:"Six nights in Shanghai. I'm coming in from the airport on the maglev at 300 km/h, which I've wanted to ride for years. Mornings I want to find the parks where people dance and sing, and afternoons I'll wander the old French Concession under the plane trees.",
+  stay:{name:"Desti Youth Hostel", zh:"Jing'an Temple · Metro Line 2", facts:"6 nights", price:"", status:"ok"},
+  home:{lat:31.2229,lon:121.4462},
+  stations:[{n:"Jing'an Temple · Lines 2, 7, 14",lat:31.2236,lon:121.4478}],
+  legs:["<b>In</b> ✈ Pudong 17:35 Fri → maglev → Line 2", "<b>Out</b> 🚄 Hongqiao 08:55 → Xi'an 14:34, Thu Nov 19"],
+  gallery:[
+    {ph:"shanghai-fuxing",n:"Fuxing Park",tag:"must",note:"Ballroom dancing, singing and tai chi from 6 to 9 in the morning. I'm setting an alarm for this"},
+    {ph:"shanghai-2",n:"Wukang Mansion",tag:"must",note:"The flatiron building at the heart of the French Concession, and the streets around it"},
+    {ph:"shanghai-thames",n:"Thames Town",tag:"must",note:"A fake English town out in Songjiang. I have to see this"},
+    {ph:"shanghai-1",n:"The Bund and Lujiazui",tag:"maybe",note:"The skyline across the river, lit up after dark"},
+    {ph:"shanghai-3",n:"Yu Garden",tag:"maybe",note:"The classical garden in the old city, if I can get there at opening before the crowds"},
+    {ph:"shanghai-4",n:"The maglev",tag:"must",note:"Airport to the city in eight minutes. First thing I do when I land"}],
+  map:{points:[
+    {n:"People's Park",lat:31.2335,lon:121.4716,k:"must",note:"Marriage Market, Sat and Sun"},
+    {n:"Fuxing Park",lat:31.2192,lon:121.4683,k:"must",note:"Dancing and singing at dawn"},
+    {n:"Xintiandi",lat:31.2203,lon:121.4752,k:"must",note:"French Concession"},
+    {n:"Tianzifang",lat:31.2087,lon:121.4690,k:"must",note:"French Concession lanes"},
+    {n:"Wukang Road and Mansion",lat:31.2052,lon:121.4386,k:"must",note:"French Concession"},
+    {n:"The Bund",lat:31.2405,lon:121.4905,k:"maybe",note:"Best at night"},
+    {n:"Yu Garden",lat:31.2272,lon:121.4921,k:"maybe",note:"Go at opening"},
+    {n:"Shanghai Tower",lat:31.2335,lon:121.5055,k:"maybe",note:"Observation deck at dusk"}],
+   shapes:[{t:"line",cls:"water",lab:"Huangpu River",pts:[[31.252,121.4985],[31.244,121.4905],[31.236,121.4935],[31.228,121.4985],[31.218,121.5035],[31.207,121.4985],[31.199,121.488]]}],
+   off:[["Hongqiao station","13 km west · Line 2, about 40 min"],["Pudong Airport","35 km east · maglev + Line 2"],["Thames Town","30 km southwest · Line 2 → 9 + taxi, about 1¼ h"]]},
+  days:[
+    {w:"Fri Nov 13",e:"Arrive",items:[["Maglev to Longyang Road, Line 2 to Jing'an Temple, check in"]]},
+    {w:"Sat Nov 14",e:"Weekend",h:"People's Park, Nanjing Road, the Bund",items:[["The Marriage Market in People's Park, around midday","must"],["Walk Nanjing Road East to the Bund","maybe"],["The ¥2 ferry across the river, Shanghai Tower at dusk","maybe"]]},
+    {w:"Sun Nov 15",e:"On foot",h:"Fuxing Park at dawn, then the French Concession",items:[["Fuxing Park 6–9am: join the dancing and singing","must"],["Xintiandi, Tianzifang, Anfu Road, Wukang Road","must"]]},
+    {w:"Mon Nov 16",e:"Half day out",h:"Thames Town",items:[["Line 2 → Line 9 to Songjiang University Town, short taxi","must"],["A quiet evening on the hostel rooftop"]]},
+    {w:"Tue Nov 17",e:"Old city",h:"Yu Garden and markets",items:[["Yu Garden at opening","maybe"],["AP Plaza for replica shopping","maybe"]]},
+    {w:"Wed Nov 18",e:"Flexible",h:"The fancy McDonald's, and favourites again",items:[["The \"world's fanciest McDonald's\" (location to confirm)","must"],["Qipu Road market, then pack","maybe"]]},
+    {w:"Thu Nov 19",e:"Travel",items:[["Leave the hostel about 7:45, Line 2 to Hongqiao"]],travel2:"🚄 Shanghai Hongqiao 08:55 → Xi'an North 14:34"}]},
+
+ {id:"xian", cjk:"西安", name:"Xi'an", dates:"Thu Nov 19 – Sun Nov 22", nights:"3 nights", short:"3 nights",
+  hero:"xian-1",
+  lede:"Three nights in Xi'an, China's capital for more than a thousand years. I'm staying inside the Ming city wall, a short walk from the Muslim Quarter's food streets. The big one here is a morning with the Terracotta Army.",
+  stay:{name:"Quantangji Hotel", zh:"Inside the old city wall, by the Bell Tower", facts:"3 nights", price:"", status:"ok"},
+  home:{lat:34.2656,lon:108.9448},
+  stations:[{n:"Bell Tower · Lines 2, 6",lat:34.2598,lon:108.9478}],
+  legs:["<b>In</b> 🚄 Xi'an North 14:34 Thu → Line 2", "<b>Out</b> 🚄 Xi'an North 12:04 → Beijing 16:32, Sun"],
+  gallery:[
+    {ph:"xian-1",n:"Terracotta Army",tag:B,note:"Friday morning, at the gate when it opens"},
+    {ph:"xian-qujiang",n:"Tang Paradise",tag:"must",note:"Tang-style halls lit up around a lake at night. This looked unreal in the videos"},
+    {ph:"xian-3",n:"Muslim Quarter",tag:"maybe",note:"Skewers, roujiamo and biangbiang noodles. I'll be eating here most nights"},
+    {ph:"xian-2",n:"The city wall",tag:"maybe",note:"14 km around the old centre. Thinking about renting a bike at the South Gate"},
+    {ph:"xian-goose",n:"Big Wild Goose Pagoda",tag:"maybe",note:"Tang dynasty, seventh century"},
+    {ph:"xian-4",n:"The Bell Tower",tag:"maybe",note:"Lit up at night, right by my hotel"}],
+  map:{points:[
+    {n:"Muslim Quarter",lat:34.2646,lon:108.9418,k:"maybe",note:"Food streets"},
+    {n:"Drum Tower",lat:34.2621,lon:108.9426,k:"maybe",note:"Lit at night"},
+    {n:"Bell Tower",lat:34.2610,lon:108.9470,k:"maybe",note:"Centre of the old city"},
+    {n:"Great Mosque",lat:34.2632,lon:108.9390,k:"maybe",note:"Chinese-style mosque"},
+    {n:"South Gate",lat:34.2513,lon:108.9470,k:"maybe",note:"Bikes for the wall"},
+    {n:"Shaanxi History Museum",lat:34.2240,lon:108.9540,k:"maybe",note:"Free, timed ticket"},
+    {n:"Big Wild Goose Pagoda",lat:34.2192,lon:108.9640,k:"maybe",note:"Tang pagoda"},
+    {n:"Tang Paradise",lat:34.2135,lon:108.9765,k:"must",note:"At night, Fri Nov 20"}],
+   shapes:[{t:"rect",cls:"area",lab:"City wall",b:[34.2775,108.9230,34.2508,108.9690]}],
+   off:[["Xi'an North station","13 km north · Line 2, about 30 min"],["Terracotta Army","35 km east · about 1 hour"]]},
+  days:[
+    {w:"Thu Nov 19",e:"Arrive",items:[["Line 2 to Bell Tower, at the hotel about 15:15"],["Dinner in the Muslim Quarter, the towers lit up"]]},
+    {w:"Fri Nov 20",e:"Weekday",h:"Terracotta Army, then Tang Paradise",items:[["The Warriors at opening; a small-group tour is good company",B],["Shaanxi History Museum or the Big Wild Goose Pagoda","maybe"],["Tang Paradise lit up after dark","must"]]},
+    {w:"Sat Nov 21",e:"City day",h:"The wall and the old town",items:[["Cycle the city wall from the South Gate","maybe"],["The Great Mosque, the Muslim Quarter again","maybe"]]},
+    {w:"Sun Nov 22",e:"Travel",items:[["A free morning. Line 2 to Xi'an North by 11:20"]],travel2:"🚄 Xi'an North 12:04 → Beijing West 16:32"}]},
+
+ {id:"beijing", cjk:"北京", name:"Beijing", dates:"Sun Nov 22 – Fri Nov 27", nights:"5 nights", short:"5 nights",
+  hero:"beijing-1",
+  lede:"Five nights in Beijing to finish China, cold and clear by late November. The Great Wall, the Forbidden City, dawn at the Temple of Heaven, and the hutong bars at night.",
+  stay:{name:"Livefortuna Hotel", zh:"Jianguomen, east of the old city", facts:"5 nights", price:"", status:"ok"},
+  home:{lat:39.9182,lon:116.4392},
+  stations:[{n:"Jianguomen · Lines 1, 2",lat:39.9078,lon:116.4352},{n:"Chaoyangmen · Lines 2, 6",lat:39.9241,lon:116.4340},{n:"Dongdaqiao · Line 6",lat:39.9226,lon:116.4486}],
+  legs:["<b>In</b> 🚄 Beijing West 16:32 Sun → DiDi, ~40 min", "<b>Out</b> ✈ Capital 09:55 → Haneda 14:25, Fri Nov 27"],
+  gallery:[
+    {ph:"wall-1",n:"The Great Wall",tag:"must",note:"Monday at Mutianyu. This photo is Jinshanling, further east"},
+    {ph:"beijing-1",n:"Forbidden City",tag:B,note:"Tuesday, in at opening. It's closed on Mondays"},
+    {ph:"beijing-2",n:"Temple of Heaven",tag:"maybe",note:"At dawn, when locals come to the park to sing and dance"},
+    {ph:"beijing-3",n:"Houhai and the Drum Tower",tag:"maybe",note:"Bars along the lake at dusk"},
+    {ph:"beijing-4",n:"The hutongs",tag:"maybe",note:"Small bars and craft beer in the lanes around Gulou"},
+    {ph:"wall-2",n:"Watchtowers",tag:"must",note:"The towers along the ridge are the part of the wall I most want to walk"}],
+  map:{points:[
+    {n:"Forbidden City",lat:39.9163,lon:116.3972,k:"must",note:"Tue Nov 24"},
+    {n:"Tiananmen Square",lat:39.9050,lon:116.3976,k:"maybe",note:"The way in"},
+    {n:"Jingshan Park",lat:39.9256,lon:116.3967,k:"maybe",note:"View over the roofs"},
+    {n:"Beihai Park",lat:39.9262,lon:116.3870,k:"maybe",note:"Lake and white dagoba"},
+    {n:"Nanluoguxiang",lat:39.9372,lon:116.4031,k:"maybe",note:"Hutongs, small bars"},
+    {n:"Drum Tower and Houhai",lat:39.9405,lon:116.3915,k:"maybe",note:"Lakeside at dusk"},
+    {n:"Lama Temple",lat:39.9475,lon:116.4175,k:"maybe",note:"Tibetan Buddhist temple"},
+    {n:"Wangfujing",lat:39.9140,lon:116.4110,k:"maybe",note:"Shopping street"},
+    {n:"Temple of Heaven",lat:39.8822,lon:116.4066,k:"maybe",note:"Dawn, with locals"},
+    {n:"Silk Street",lat:39.9088,lon:116.4505,k:"maybe",note:"Market, 2 km from the hotel"},
+    {n:"Beijing West station",lat:39.8950,lon:116.3220,k:"must",note:"Arrive Sun 16:32"}],
+   shapes:[{t:"rect",cls:"area",lab:"2nd Ring Road · the old city",b:[39.9485,116.3560,39.8690,116.4345]},{t:"rect",cls:"solid",lab:"",b:[39.9235,116.3910,39.9125,116.4030]}],
+   off:[["Great Wall at Mutianyu","70 km northeast · about 1.5 h"],["Capital Airport","25 km northeast · DiDi about 35 min"],["Summer Palace","15 km northwest"]]},
+  days:[
+    {w:"Sun Nov 22",e:"Arrive",items:[["DiDi from Beijing West, easy dinner near Ritan Park, early night"]]},
+    {w:"Mon Nov 23",e:"Palace closed",h:"The Great Wall at Mutianyu",items:[["Leave about 7:00; cable car up, toboggan down","must"]]},
+    {w:"Tue Nov 24",e:"Imperial day",h:"Forbidden City",items:[["In at opening through Tiananmen",B],["Jingshan Park for the view, then Beihai","maybe"],["Evening in the hutong bars at Gulou","maybe"]]},
+    {w:"Wed Nov 25",e:"Temples",h:"Temple of Heaven at dawn",items:[["Locals singing and dancing until about 8am","maybe"],["Lama Temple, then Houhai at dusk","maybe"]]},
+    {w:"Thu Nov 26",e:"Thanksgiving",h:"Last full day",items:[["Summer Palace, 798 Art District or Silk Street","maybe"],["Peking duck dinner"]]},
+    {w:"Fri Nov 27",e:"Fly",items:[["DiDi to the airport about 7:00"]],travel2:"✈ Beijing Capital 09:55 → Tokyo Haneda 14:25"}]},
+
+ {id:"tokyo", cjk:"東京", name:"Tokyo", dates:"Fri Nov 27 – Sun Dec 6", nights:"9 nights", short:"9 nights",
+  hero:"tokyo-shibuya",
+  lede:"Then Tokyo, where my friends land the same evening. A few nights of small bars, darts, pool and live music, then one or two more places in Japan before we fly home on December 6.",
+  stay:{name:"Not booked yet", zh:"With friends · Shibuya base being considered", facts:"", price:"", status:"todo"},
+  stations:[],
+  legs:["<b>In</b> ✈ Haneda 14:25 · friends land Narita 17:30", "<b>Out</b> ✈ Tokyo → Honolulu, Sun Dec 6"],
+  gallery:[
+    {ph:"tokyo-shibuya",n:"Shibuya",tag:"must",note:"Where we'll probably base ourselves"},
+    {ph:"tokyo-shimokita",n:"Shimokitazawa",tag:"maybe",note:"Small bars, record shops and live music"},
+    {ph:"tokyo-1",n:"Jingu Gaien ginkgo avenue",tag:"maybe",note:"Should be gold by the end of November"}],
+  map:{points:[
+    {n:"Shibuya",lat:35.6595,lon:139.7005,k:"must",note:"Base being considered"},
+    {n:"Shimokitazawa",lat:35.6618,lon:139.6680,k:"maybe",note:"Small bars, live music"},
+    {n:"Sangenjaya",lat:35.6436,lon:139.6704,k:"maybe",note:"Tiny bars"},
+    {n:"Ebisu Yokocho",lat:35.6467,lon:139.7101,k:"maybe",note:"Food and drink alley"},
+    {n:"Koenji",lat:35.7052,lon:139.6496,k:"maybe",note:"Live houses and bars"},
+    {n:"Meiji Shrine",lat:35.6764,lon:139.6993,k:"maybe",note:"Forest shrine"},
+    {n:"Jingu Gaien ginkgo avenue",lat:35.6745,lon:139.7175,k:"maybe",note:"Late-November gold"}],
+   shapes:[], off:[["Haneda Airport","15 km south"],["Narita Airport","60 km east"]]},
+  days:[
+    {w:"Nov 27 – Dec 1",e:"Tokyo",h:"Small bars, darts, pool, live music",items:[["Shimokitazawa, Koenji, Sangenjaya, Ebisu Yokocho","maybe"],["The ginkgo avenue at Jingu Gaien","maybe"]]},
+    {w:"Dec 1 – 5",e:"Undecided",h:"One or two more places",items:[["Kanazawa and Hakone, Hiroshima and Osaka, or Hakone and Kawaguchiko"]]},
+    {w:"Sun Dec 6",e:"Home",travel2:"✈ Tokyo → Honolulu · United, ANA-operated",items:[]}]}
+];
+
+const NS="http://www.w3.org/2000/svg";
+const el=(t,a={},p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const TAGTXT={must:"Must-do",maybe:"Maybe",book:"Book ahead"};
+const tag=k=>k?`<span class="tag ${k}">${TAGTXT[k]}</span>`:"";
+
+/* ---------- route map + scroll ---------- */
+const legEls=[];
+function drawRoute(){
+  const C=CITY_XY,W=900;
+  const defs=[
+    {d:`M${W+4},214 Q${W-30},218 ${C.narita[0]},${C.narita[1]}`,c:"fly"},
+    {d:`M${C.narita[0]},${C.narita[1]} Q640,330 ${C.shanghai[0]},${C.shanghai[1]}`,c:"fly",lab:"Nov 13",lx:612,ly:318},
+    {d:`M${C.shanghai[0]},${C.shanghai[1]} L${C.xian[0]},${C.xian[1]}`,c:"train",lab:"5h39 · Nov 19",lx:236,ly:342},
+    {d:`M${C.xian[0]},${C.xian[1]} L${C.beijing[0]},${C.beijing[1]}`,c:"train",lab:"4h28 · Nov 22",lx:118,ly:180},
+    {d:`M${C.beijing[0]},${C.beijing[1]} Q560,120 ${C.tokyo[0]},${C.tokyo[1]}`,c:"fly",lab:"Nov 27",lx:548,ly:146},
+    {d:`M${C.tokyo[0]},${C.tokyo[1]} Q${W-40},262 ${W+4},262`,c:"fly"}];
+  const gb=document.getElementById("legs-base"),gp=document.getElementById("legs-prog"),gl=document.getElementById("leg-labels");
+  defs.forEach(l=>{el("path",{d:l.d,class:"leg-base "+l.c},gb);const p=el("path",{d:l.d,class:"leg-prog"},gp);const L=p.getTotalLength();p.style.strokeDasharray=L;p.style.strokeDashoffset=L;legEls.push({p,L});
+    if(l.lab)el("text",{x:l.lx,y:l.ly,class:"leglab"},gl).textContent=l.lab});
+  el("text",{x:W-8,y:300,class:"leglab","text-anchor":"end"},gl).textContent="Honolulu ⇄ Nov 11 · Dec 6";
+  const lab={narita:{dx:6,dy:-18,a:"start"},tokyo:{dx:-14,dy:30,a:"end"},shanghai:{dx:16,dy:6,a:"start"},xian:{dx:0,dy:34,a:"middle"},beijing:{dx:16,dy:-6,a:"start"}};
+  const cg=document.getElementById("cities");
+  STOPS.forEach(s=>{const[x,y]=C[s.id],L=lab[s.id];
+    const g=el("g",{class:"city "+s.id,tabindex:"0",role:"link","aria-label":`Go to ${s.name}, ${s.dates}`,"data-id":s.id},cg);
+    el("circle",{cx:x,cy:y,r:20,class:"ring"},g);el("circle",{cx:x,cy:y,r:s.id==="narita"?7:9,class:"dot"},g);
+    el("text",{x:x+L.dx,y:y+L.dy,"text-anchor":L.a},g).textContent=s.name;
+    el("text",{x:x+L.dx,y:y+L.dy+15,"text-anchor":L.a,class:"sub"},g).textContent=s.short;
+    const go=()=>document.getElementById(s.id).scrollIntoView({block:"start"});
+    g.addEventListener("click",go);g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}})});
+  const strip=document.getElementById("strip");
+  STOPS.forEach(s=>{const b=document.createElement("button");b.type="button";b.className=s.id;b.textContent=s.name;b.dataset.id=s.id;b.addEventListener("click",()=>document.getElementById(s.id).scrollIntoView({block:"start"}));strip.appendChild(b)});
+}
+let active=-1;
+function setActive(i){
+  if(i===active)return; active=i; const s=STOPS[i];
+  document.querySelectorAll("#strip button").forEach(b=>b.classList.toggle("on",b.dataset.id===s.id));
+}
+function onScroll(){
+  const secs=[...document.querySelectorAll(".chapter")], mid=innerHeight*0.45;
+  let prog=0, cur=0;
+  secs.forEach((sec,i)=>{const r=sec.getBoundingClientRect(); if(r.top<=mid){cur=i; const f=Math.min(1,Math.max(0,(mid-r.top)/r.height)); prog=i+f}});
+  const first=secs[0].getBoundingClientRect().top;
+  if(first>mid) prog=Math.max(0,1-(first-mid)/innerHeight)*0.999-1;
+  setActive(cur);
+}
+
+/* ---------- viewer ---------- */
+const V=document.getElementById("viewer"); let vlist=[],vi=0;
+function openViewer(setId,ph){const s=STOPS.find(x=>x.id===setId);vlist=[...new Set([s.hero,...s.gallery.map(g=>g.ph)])];vi=Math.max(0,vlist.indexOf(ph));show();if(V.showModal)V.showModal();else V.setAttribute("open","")}
+function show(){vi=(vi+vlist.length)%vlist.length;const k=vlist[vi],p=PHOTOS[k],img=document.getElementById("v-img");img.src="photos/"+k+".jpg";img.alt=p.cap;
+  document.getElementById("v-cap").innerHTML=`${esc(p.cap)}<small>${esc(p.by)} · ${esc(p.lic)} · <a href="${esc(p.page)}" target="_blank" rel="noopener">Wikimedia Commons</a> · ${vi+1} of ${vlist.length}</small>`}
+document.getElementById("v-prev").onclick=()=>{vi--;show()};
+document.getElementById("v-next").onclick=()=>{vi++;show()};
+document.getElementById("v-close").onclick=()=>V.close?V.close():V.removeAttribute("open");
+V.addEventListener("click",e=>{if(e.target===V)V.close()});
+V.addEventListener("keydown",e=>{if(e.key==="ArrowLeft"){vi--;show()}if(e.key==="ArrowRight"){vi++;show()}});
+
+
+/* ---------- split-flap departures board ---------- */
+const REDUCED=matchMedia("(prefers-reduced-motion: reduce)").matches;
+// like a real board, a letter tile only carries letters and a number tile only digits; colons are printed, not flipped
+const LETTERS=" ABCDEFGHIJKLMNOPQRSTUVWXYZ", DIGITS=" 0123456789";
+const setFor=ch=>/[0-9]/.test(ch)?DIGITS:/[A-Z]/.test(ch)?LETTERS:ch==="+"?DIGITS+"+":(ch==="/"||ch==="'")?LETTERS+ch:null;
+const COLS=[{k:"date",w:6,l:"Date"},{k:"from",w:8,l:"From"},{k:"to",w:8,l:"To"}];
+const LEGS=[
+ {date:"11 Nov",from:"Honolulu",to:"Narita"},
+ {date:"13 Nov",from:"Narita",to:"Shanghai"},
+ {date:"19 Nov",from:"Shanghai",to:"Xi'an"},
+ {date:"22 Nov",from:"Xi'an",to:"Beijing"},
+ {date:"27 Nov",from:"Beijing",to:"Tokyo"},
+ {date:"6 Dec",from:"Tokyo",to:"Honolulu"}];
+
+const tileHTML=ch=>`<span class="tile" data-t="${esc(ch)}"><span class="hf hi"><i> </i></span><span class="hf lo"><i> </i></span><span class="hf fp"><i> </i></span></span>`;
+function buildBoard(){
+  const host=document.getElementById("solari"),cols=document.getElementById("sol-cols"),tb=document.querySelector("#sol-table tbody");
+  cols.innerHTML=COLS.map(c=>`<span style="width:calc(${c.w}*var(--tw) + ${c.w-1}px)">${c.l}</span>`).join("");
+  tb.innerHTML=LEGS.map(r=>`<tr>${COLS.map(c=>`<td>${esc(r[c.k]||"—")}</td>`).join("")}</tr>`).join("");
+  host.innerHTML=LEGS.map((r,ri)=>`<div class="sol-row${ri===0?" first":""}">${COLS.map(c=>{
+    const v=(r[c.k]||"").toUpperCase().padEnd(c.w).slice(0,c.w);
+    return `<div class="sol-cell">${[...v].map(tileHTML).join("")}</div>`}).join("")}</div>`).join("");
+  const rows=[...host.querySelectorAll(".sol-row")];
+  const setChar=(t,ch)=>t.querySelectorAll("i").forEach(i=>i.textContent=ch);
+  if(REDUCED){rows.forEach(r=>r.querySelectorAll(".tile").forEach(t=>setChar(t,t.dataset.t)));return}
+  // every tile flips from blank to its letter, row by row, left to right
+  const run=full=>rows.forEach((row,ri)=>row.querySelectorAll(".tile").forEach((t,ti)=>{
+    const target=t.dataset.t; if(target===" "||t.dataset.busy)return;
+    setTimeout(()=>flipTo(t,target,full),ri*150+ti*14);
+  }));
+  // the board flips in once it is on screen, then every minute the whole board cycles round again, the way a real one refreshes
+  let started=false;
+  const start=()=>{if(started)return;started=true;setTimeout(()=>run(false),300);
+    setInterval(()=>{if(document.visibilityState==="visible")run(true)},60000)};
+  const sec=document.querySelector(".solari");
+  if("IntersectionObserver" in window){const io=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting)){start();io.disconnect()}},{threshold:.15});io.observe(sec);setTimeout(start,6000)}
+  else setTimeout(start,400);
+}
+function flipTo(t,target,full){
+  const hi=t.querySelector(".hi i"),lo=t.querySelector(".lo i"),fp=t.querySelector(".fp i"),SET=setFor(target);
+  if(!SET){[hi,lo,fp].forEach(i=>i.textContent=target);return}
+  const N=SET.length,tgt=SET.indexOf(target);
+  let cur=lo.textContent, idx=Math.max(0,SET.indexOf(cur));
+  let left=((tgt-idx)%N+N)%N; if(left===0&&full)left=N;
+  t.dataset.busy="1";
+  const step=()=>{
+    if(left===0){t.classList.remove("go");delete t.dataset.busy;return}
+    left--; idx=(idx+1)%N; const next=SET[idx];
+    hi.textContent=next; fp.textContent=cur;
+    t.classList.remove("go"); void t.offsetWidth; t.classList.add("go");
+    let fired=false;
+    const done=()=>{if(fired)return;fired=true;lo.textContent=next;fp.textContent=next;cur=next;step()};
+    t.addEventListener("animationend",done,{once:true}); setTimeout(done,150);
+  };
+  step();
+}
+
+/* ---------- behind the board: the cities, one photo each, in route order ---------- */
+const SLIDES=[{ph:"narita-1",city:"Narita"},{ph:"shanghai-skyline",city:"Shanghai"},{ph:"xian-4",city:"Xi'an"},{ph:"beijing-1",city:"Beijing"},{ph:"tokyo-shibuya",city:"Tokyo"}];
+function buildSlides(){
+  const host=document.getElementById("slides"); if(!host)return;
+  const imgs=SLIDES.map(s=>{const im=document.createElement("img");im.src="photos/"+s.ph+".jpg";im.alt="";im.decoding="async";host.appendChild(im);return im});
+  const credits=document.getElementById("credits");
+  if(credits)credits.textContent="Background photos: "+SLIDES.map(s=>{const p=PHOTOS[s.ph];return p.lic==="CC0"?`${s.city} by ${p.by} (public domain)`:`${s.city} by ${p.by} (${p.lic})`}).join(" · ")+" · via Wikimedia Commons.";
+  let i=0;
+  const show=n=>{imgs.forEach((im,k)=>{im.classList.toggle("off",im.classList.contains("on")&&k!==n);im.classList.toggle("on",k===n)})};
+  show(0);
+  if(REDUCED||imgs.length<2)return;
+  setInterval(()=>{if(document.visibilityState!=="visible")return;i=(i+1)%imgs.length;show(i)},8000);
+}
+
+/* ---------- the stops: a band and a photo each; tap one for the home base and the sights ---------- */
+function renderChapters2(){
+  const host=document.getElementById("chapters"); if(!host)return;
+  host.innerHTML=STOPS.map((s,i)=>`<section class="chapter ${s.id}" id="${s.id}" aria-labelledby="h-${s.id}">
+    <button type="button" class="ch-open" data-open="${s.id}" aria-haspopup="dialog" aria-label="${esc(s.name)}: open the details">
+      <img class="ch-img" src="photos/${s.hero}.jpg" alt="" loading="lazy">
+      <span class="ch-kanji" lang="${s.id==="narita"||s.id==="tokyo"?"ja":"zh"}" aria-hidden="true">${s.cjk}</span>
+      <span class="ch-meta"><h2 id="h-${s.id}">${esc(s.name)}</h2><span class="when">${esc(s.dates)}</span></span>
+      <span class="ch-more" aria-hidden="true">+</span>
+    </button></section>`).join("");
+  host.addEventListener("click",e=>{const b=e.target.closest("[data-open]");if(b)openDetail(b.dataset.open)});
+}
+function openDetail(id){
+  const s=STOPS.find(x=>x.id===id),st=s.stay,D=document.getElementById("detail"); if(!s||!D)return;
+  D.className="detail "+s.id;
+  D.innerHTML=`<div class="band"><span class="cjk" lang="${s.id==="narita"||s.id==="tokyo"?"ja":"zh"}">${s.cjk}</span>
+      <div><h2>${esc(s.name)}</h2><p class="when">${esc(s.dates)} · ${esc(s.nights)}</p></div>
+      <button type="button" class="dt-close" data-close aria-label="Close">×</button></div>
+    <div class="dt-body">
+      <p class="lede">${esc(s.lede)}</p>
+      <h3 class="sub">Cool stuff</h3>
+      <div class="dt-grid">${s.gallery.map(g=>`<div class="card"><button type="button" data-ph="${g.ph}" data-set="${s.id}" aria-label="Open photo: ${esc(g.n)}"><img src="photos/${g.ph}.jpg" alt="${esc(PHOTOS[g.ph].cap)}" loading="lazy"></button><div class="txt"><b>${esc(g.n)}</b><small>${esc(g.note)}</small></div></div>`).join("")}</div>
+      <p class="dt-stay">${st.status==="ok"?`Staying at <b>${esc(st.name)}</b>, ${esc(st.zh)}${st.facts?` · ${esc(st.facts)}`:""}`:`Where I'm staying: <b>not booked yet</b> · ${esc(st.zh)}`}</p>
+    </div>`;
+  D.querySelector("[data-close]").onclick=()=>D.close();
+  D.onclick=e=>{if(e.target===D){D.close();return}const b=e.target.closest("[data-ph]");if(b)openViewer(b.dataset.set,b.dataset.ph)};
+  if(D.showModal)D.showModal();else D.setAttribute("open","");
+  D.scrollTop=0;
+}
+renderChapters2(); buildBoard(); buildSlides(); reveals();
+</script>
+
+</body></html>
