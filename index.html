@@ -57,11 +57,11 @@
   /* ---------- hero: the title over a slow slideshow of the cities, with a small split-flap board beneath it ---------- */
   .hero{position:relative;background:#171512;min-height:min(88vh,820px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(18px,3.5vh,34px);padding-block:clamp(56px,10vh,120px) clamp(56px,9vh,96px);overflow:hidden}
   .slides{position:absolute;inset:-8% 0;will-change:transform}
-  /* each slide zooms for exactly as long as it is shown, then holds that zoom while it fades, so nothing snaps */
-  .slides img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 2.8s ease-in-out;will-change:opacity,transform;transform:scale(1)}
-  .slides img.on{opacity:1;animation:kb 8s linear forwards}
-  .slides img.off{transform:scale(1.07)}
-  @keyframes kb{from{transform:scale(1)}to{transform:scale(1.07)}}
+  /* every slide drifts in and out of its zoom the whole time, so a crossfade never changes a transform; only opacity moves */
+  .slides img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 3s ease-in-out;will-change:opacity,transform;animation:kb 26s ease-in-out infinite alternate}
+  .slides img:nth-child(2){animation-delay:-9s}.slides img:nth-child(3){animation-delay:-17s}.slides img:nth-child(4){animation-delay:-5s}.slides img:nth-child(5){animation-delay:-21s}
+  .slides img.on{opacity:1}
+  @keyframes kb{from{transform:scale(1)}to{transform:scale(1.08)}}
   .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,11,9,.42) 0%,rgba(14,11,9,.38) 45%,rgba(14,11,9,.7) 100%);pointer-events:none}
   .hero-title{position:relative;z-index:1;font-family:var(--f-display);font-weight:900;font-size:clamp(64px,15vw,168px);line-height:.86;letter-spacing:.01em;text-transform:uppercase;color:#FFFFFF;text-align:center;margin:0;padding-inline:16px;text-wrap:balance;text-shadow:0 6px 36px rgba(0,0,0,.6)}
   .hero .inner{position:relative;z-index:1;width:100%;max-width:560px;margin:0}
@@ -647,10 +647,12 @@ const SLIDES=[{ph:"narita-1",city:"Narita"},{ph:"shanghai-skyline",city:"Shangha
 function buildSlides(){
   const host=document.getElementById("slides"); if(!host)return;
   const imgs=SLIDES.map(s=>{const im=document.createElement("img");im.src="photos/"+s.ph+".jpg";im.alt="";im.decoding="async";host.appendChild(im);return im});
+  // decode every slide up front so the first crossfade onto each one never waits on a JPEG decode
+  imgs.forEach(im=>{if(im.decode)im.decode().catch(()=>{})});
   const credits=document.getElementById("credits");
   if(credits)credits.textContent="Background photos: "+SLIDES.map(s=>{const p=PHOTOS[s.ph];return p.lic==="CC0"?`${s.city} by ${p.by} (public domain)`:`${s.city} by ${p.by} (${p.lic})`}).join(" · ")+" · via Wikimedia Commons.";
   let i=0;
-  const show=n=>{imgs.forEach((im,k)=>{im.classList.toggle("off",im.classList.contains("on")&&k!==n);im.classList.toggle("on",k===n)})};
+  const show=n=>imgs.forEach((im,k)=>im.classList.toggle("on",k===n));
   show(0);
   if(REDUCED||imgs.length<2)return;
   setInterval(()=>{if(document.visibilityState!=="visible")return;i=(i+1)%imgs.length;show(i)},8000);
