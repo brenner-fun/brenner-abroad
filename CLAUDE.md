@@ -35,6 +35,14 @@ The script still carries data and code for sections that are currently switched 
 
 Commit as `Brenner Danielson <info@grassrootinstitute.org>` if no git identity is configured.
 
+## The locked wallet page
+
+`wallet/index.html` is the owner's private Trip Wallet (addresses, flights, hotels), published **encrypted**: AES-256-GCM with a key derived from a passphrase (PBKDF2). It is not linked from the main page and carries a noindex meta tag. The plaintext source lives only on the owner's Mac (`2026 Trip/wallet-src/index.html`) and as a private claude.ai artifact; never commit it. To update the wallet: edit the plaintext, then run
+
+    node tools/encrypt-wallet.mjs <plaintext.html> wallet/index.html '<passphrase>'
+
+and push. The passphrase is known only to the owner; ask them for it.
+
 ## Private material
 
 Planning notes, budgets and the earlier full version of the page with maps and day-by-day are kept outside this public repository, on the owner's Mac in the `2026 Trip` folder. Ask the owner if they are needed.
