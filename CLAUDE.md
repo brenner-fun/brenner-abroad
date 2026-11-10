@@ -47,3 +47,13 @@ and push. The passphrase is known only to the owner; ask them for it.
 ## Private material
 
 Planning notes, budgets and the earlier full version of the page with maps and day-by-day are kept outside this public repository, on the owner's Mac in the `2026 Trip` folder. Ask the owner if they are needed.
+
+## Link preview and icons
+
+When the link is sent in a text or chat, the preview comes from the Open Graph tags at the top of `index.html` (`og:title`, `og:description`, `og:image`) and from three files in the repo root:
+
+- `preview.png` (1200x630): the card with the title, the dates and the cartoon of me.
+- `icon.svg`: the browser tab icon (my cartoon face).
+- `apple-touch-icon.png` (180x180): the icon for iPhone home screens and bookmarks.
+
+If the trip dates or the title change, redraw `preview.png` too. Messaging apps cache previews, so a changed image only shows on links sent after the change (adding `?v=2` to the link forces a fresh one).
