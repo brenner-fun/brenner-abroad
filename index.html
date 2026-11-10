@@ -163,22 +163,27 @@
   .now-at .cjk-sm.lat{font-family:var(--f-display);font-size:30px;letter-spacing:.02em}
   .now-at b{font-family:var(--f-display);font-weight:800;text-transform:uppercase;font-size:clamp(22px,3.4vw,28px);letter-spacing:.02em;display:block;line-height:1}
   .now-at small{display:block;margin-top:4px;font-size:14.5px;line-height:1.35;color:var(--ink-2)}
-  .map-card{position:relative;background:var(--sea);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line);--halo:#FFFFFF;container-type:inline-size}
+  .map-card{--me:34px;position:relative;background:var(--sea);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line);--halo:#FFFFFF;container-type:inline-size}
   @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .map-card{--halo:#0E1A31}}
   :root[data-theme="dark"] .map-card{--halo:#0E1A31}
   .map-card svg{display:block;width:100%;height:auto}
   .m-land{fill:var(--land);stroke:var(--border);stroke-width:1;stroke-linejoin:round;vector-effect:non-scaling-stroke}
   .m-border{fill:none;stroke:var(--border);stroke-width:1;stroke-dasharray:3 3;vector-effect:non-scaling-stroke}
-  .lg{fill:none;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
-  .lg.todo{stroke:var(--ink-3);stroke-width:2.4;stroke-dasharray:.1 7}
-  .lg.done{stroke:var(--ink);stroke-width:3.2}
+  /* flights are dashed arcs, bullet trains are drawn as track; the part still to come is faded */
+  .lg{fill:none;stroke-linejoin:round;vector-effect:non-scaling-stroke;stroke-width:2.4}
+  .lg.todo{stroke:var(--ink-3);opacity:.55}
+  .lg.done{stroke:var(--ink)}
+  .lg.fly{stroke-dasharray:7 7;stroke-linecap:round}
+  .lg.rail{stroke-linecap:butt}
+  .lg.ties{stroke-width:9;stroke-dasharray:2 6;stroke-linecap:butt}
+  .lg.done.fly,.lg.done.rail{stroke-width:3}
   .m-ctry{position:absolute;transform:translate(-50%,-50%);font-family:var(--f-mono);font-size:clamp(9px,1.5cqw,13px);letter-spacing:.38em;text-transform:uppercase;color:var(--ink-3);opacity:.75;pointer-events:none;white-space:nowrap}
   .mk{position:absolute;width:40px;height:40px;margin:-20px 0 0 -20px;padding:0;border:0;background:none;color:var(--ink);cursor:pointer;-webkit-tap-highlight-color:transparent;z-index:2}
   .mk .dot{position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px;border-radius:50%;box-sizing:border-box;border:3px solid var(--band);background:var(--land);box-shadow:0 0 0 2px var(--halo);transition:background .35s,transform .35s cubic-bezier(.2,.7,.2,1)}
   .mk.seen .dot{background:var(--band)}
   .mk:hover .dot,.mk.here .dot{transform:scale(1.3)}
   .mk.here{z-index:3}
-  .mk.here .dot::after,.m-me::after,.mk-home.here i::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:2px solid var(--band);animation:ping 2.2s cubic-bezier(.2,.6,.3,1) infinite}
+  .mk.here .dot::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:2px solid var(--band);animation:ping 2.2s cubic-bezier(.2,.6,.3,1) infinite}
   @keyframes ping{from{transform:scale(1);opacity:.95}to{transform:scale(3.4);opacity:0}}
   .mk .lb{position:absolute;white-space:nowrap;line-height:1;text-align:center;text-shadow:0 0 2px var(--halo),0 0 2px var(--halo),0 0 4px var(--halo),0 0 7px var(--halo),0 0 10px var(--halo)}
   .mk .lb b{display:block;font-family:var(--f-display);font-weight:800;font-size:clamp(16px,2.5cqw,24px);text-transform:uppercase;letter-spacing:.02em}
@@ -191,17 +196,36 @@
   .lb-l .lb{right:calc(50% + 17px);top:50%;transform:translateY(-50%);text-align:right}
   .lb-t.al-s .lb,.lb-b.al-s .lb{left:calc(50% - 9px);transform:none;text-align:left}
   .lb-t.al-e .lb,.lb-b.al-e .lb{left:auto;right:calc(50% - 9px);transform:none;text-align:right}
-  .m-me{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;box-sizing:border-box;background:var(--board-fg);border:3px solid var(--board);box-shadow:0 0 0 2px var(--halo);pointer-events:none;display:none;z-index:4;--band:var(--board-fg)}
+  /* the little guy in the red cap is me: he stands by the city I'm in, and rides the line on travel days */
+  .m-me{position:absolute;width:var(--me);height:var(--me);margin:calc(var(--me)*-.5) 0 0 calc(var(--me)*-.5);z-index:4;pointer-events:none;display:none}
   .m-me.on{display:block}
-  .m-me.run::after{display:none}
+  .m-me.walk{transform:translateY(-37%)}
+  .m-me .me-in{width:100%;height:100%;animation:bob 1.5s ease-in-out infinite alternate}
+  .m-me.run .me-in{animation:none}
+  .m-me svg{display:block;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 2px 2.5px rgba(0,0,0,.4))}
+  .m-me.flip svg{transform:scaleX(-1)}
+  .m-me .p-wing,.m-me .p-car,.m-me.fly .p-pack,.m-me.fly .p-feet,.m-me.rail .p-pack,.m-me.rail .p-feet{display:none}
+  .m-me.fly .p-wing,.m-me.rail .p-car{display:block}
+  @keyframes bob{from{transform:translateY(3%)}to{transform:translateY(-6%)}}
+  .mk.here.lb-t .lb{bottom:calc(50% + var(--me)*.92)}
+  .mk.here.lb-l .lb{right:calc(50% + var(--me)*.5 + 5px)}
+  .mk.here.lb-r .lb{left:calc(50% + var(--me)*.5 + 5px)}
+  .mk.tokyo.here.lb-l .lb{right:calc(50% + var(--me)*.95 + 5px)}
   .mk-home{position:absolute;right:0;transform:translateY(-50%);z-index:2;background:var(--board);color:var(--board-fg);padding:8px 10px 8px 12px;border-radius:7px 0 0 7px;font-family:"Archivo Narrow","Arial Narrow",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.09em;font-size:clamp(12.5px,1.7cqw,16px);line-height:1.1;box-shadow:0 10px 24px -14px rgba(0,0,0,.8);--band:var(--board-fg)}
   .mk-home small{display:block;margin-top:3px;font-family:var(--f-mono);font-weight:400;font-size:clamp(9px,1.15cqw,11px);letter-spacing:.01em;text-transform:none;color:#C9CCE6}
-  .mk-home i{display:none;position:relative;width:8px;height:8px;border-radius:50%;background:var(--board-fg);margin-right:7px;vertical-align:1px}
-  .mk-home.here i{display:inline-block}
   .mk-home.here small{color:var(--board-fg)}
-  .map-key{font-size:14px;color:var(--ink-3);margin:12px 2px 0;text-align:left}
-  @media (prefers-reduced-motion:reduce){.mk.here .dot::after,.m-me::after,.mk-home.here i::after{animation:none;transform:scale(1.9);opacity:.5}}
-  @media (max-width:600px){.now{padding-block:40px 22px}.now-at .cjk-sm{font-size:28px}.now-at .cjk-sm.lat{font-size:24px}.mk .dot{width:12px;height:12px;margin:-6px;border-width:2.5px}.m-ctry{display:none}.lg.done{stroke-width:2.6}.lg.todo{stroke-width:2.1}.mk-home{padding:6px 8px 6px 10px}}
+  .map-key{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px;font-size:14px;color:var(--ink-3);margin:14px 2px 0;text-align:left}
+  .map-key span{display:inline-flex;align-items:center;gap:8px;color:var(--ink-2)}
+  .map-key svg{flex:none;overflow:visible}
+  .map-key .k{fill:none;stroke:currentColor;stroke-width:2.4}
+  .map-key .k.fly{stroke-dasharray:7 7;stroke-linecap:round}
+  .map-key .k.ties{stroke-width:9;stroke-dasharray:2 6}
+  .map-key .k-me{display:inline-block;width:26px;height:26px;margin:-4px -2px -2px}
+  .k-me svg{display:block;width:100%;height:100%;overflow:visible}
+  .k-me .p-wing,.k-me .p-car{display:none}
+  .map-key em{font-style:normal;flex-basis:100%}
+  @media (prefers-reduced-motion:reduce){.mk.here .dot::after{animation:none;transform:scale(1.9);opacity:.5}.m-me .me-in{animation:none}}
+  @media (max-width:600px){.now{padding-block:40px 22px}.now-at .cjk-sm{font-size:28px}.now-at .cjk-sm.lat{font-size:24px}.mk .dot{width:12px;height:12px;margin:-6px;border-width:2.5px}.m-ctry{display:none}.mk-home{padding:6px 8px 6px 10px}}
   
 
   /* mobile route strip */
@@ -401,7 +425,12 @@ PS: if I get kidnapped use this to find me pls &lt;3<!--/intro--></p>
       <span class="m-ctry" style="left:89%;top:36%" aria-hidden="true">Japan</span>
       <div id="m-marks"></div>
     </div>
-    <p class="map-key">Curved lines are flights, straight ones are bullet trains. The dotted parts are still to come. Tap a city for more.</p>
+    <p class="map-key">
+      <span><svg width="38" height="10" aria-hidden="true"><path class="k fly" d="M2 5H36"/></svg>Flights</span>
+      <span><svg width="38" height="10" aria-hidden="true"><path class="k" d="M1 5H37"/><path class="k ties" d="M1 5H37"/></svg>Bullet trains</span>
+      <span><i class="k-me" id="k-me" aria-hidden="true"></i>Me</span>
+      <em>The faded lines are still to come. Tap a city for more.</em>
+    </p>
   </div>
 </section>
 
@@ -717,6 +746,7 @@ const SPOT={narita:[789.5,358.7],tokyo:[776.1,361.8],shanghai:[379.8,477.3],xian
 const SPOT_LB={narita:"lb-t al-s",tokyo:"lb-l",shanghai:"lb-b",xian:"lb-b al-s",beijing:"lb-t"};
 const SPOT_WHEN={narita:"Nov 12 – 13",shanghai:"Nov 13 – 19",xian:"Nov 19 – 22",beijing:"Nov 22 – 27",tokyo:"Nov 27 – Dec 6"};
 const SPOT_TZ={home:-10,narita:9,tokyo:9,shanghai:8,xian:8,beijing:8};
+const SPOT_ME={narita:.45,tokyo:-.45}; /* where the little guy stands beside a dot, in his own widths, so Narita and Tokyo don't hide each other */
 const ROUTE=["narita","shanghai","xian","beijing","tokyo"];
 /* Every leg with its local departure and arrival. `bend` curves the flights; trains run straight. */
 const TRIP=[
@@ -728,95 +758,115 @@ const TRIP=[
   {from:"tokyo",to:"home",dep:"2026-12-06T20:10+09:00",arr:"2026-12-06T08:10-10:00",fly:1,bend:-.16,day:"Dec 6",how:"the flight home"}
 ].map(l=>({...l,d0:Date.parse(l.dep),d1:Date.parse(l.arr)}));
 const TRIP_DAYS=26, DAY1=Date.UTC(2026,10,11);
-/* add ?date=2026-11-20 to the address to see the map as it will look on that day */
-const nowT=()=>{const q=new URLSearchParams(location.search).get("date");if(!q)return Date.now();const t=Date.parse(/^\d{4}-\d\d-\d\d$/.test(q)?q+"T12:00+08:00":q);return isNaN(t)?Date.now():t};
+const ME_SVG=`<svg viewBox="0 0 48 48" focusable="false"><g class="p-wing" fill="#FFFFFF" stroke="#14152B" stroke-width="2.2" stroke-linejoin="round"><path d="M12.5 23 L1.6 29.2 Q-.2 32.6 3.6 33.2 L13.5 30.6Z"/><path d="M35.5 23 L46.4 29.2 Q48.2 32.6 44.4 33.2 L34.5 30.6Z"/></g><rect class="p-pack" x="6.6" y="20.5" width="10" height="15" rx="4.2" fill="#D93A23" stroke="#14152B" stroke-width="2.2"/><g class="p-feet" fill="#14152B"><ellipse cx="19" cy="41" rx="4.4" ry="2.6"/><ellipse cx="29.4" cy="41" rx="4.4" ry="2.6"/></g><path d="M24 6 C33.6 6 37.6 14 37.6 24.4 C37.6 34.2 32 40 24 40 C16 40 10.4 34.2 10.4 24.4 C10.4 14 14.4 6 24 6Z" fill="#FFC83D" stroke="#14152B" stroke-width="2.2"/><path d="M12.6 14.6 C13.6 3.6 34.4 3.6 35.4 14.6Z" fill="#D93A23" stroke="#14152B" stroke-width="2.2" stroke-linejoin="round"/><path d="M33.6 14.6 H42" fill="none" stroke="#14152B" stroke-width="2.6" stroke-linecap="round"/><circle cx="20.4" cy="22.4" r="2.1" fill="#14152B"/><circle cx="30.4" cy="22.4" r="2.1" fill="#14152B"/><circle cx="21.1" cy="21.6" r=".7" fill="#FFFFFF"/><circle cx="31.1" cy="21.6" r=".7" fill="#FFFFFF"/><path d="M22.6 27.4 Q25.4 30.4 28.2 27.4" fill="none" stroke="#14152B" stroke-width="1.9" stroke-linecap="round"/><ellipse cx="16.2" cy="27" rx="2.3" ry="1.5" fill="#FF7A5E" opacity=".85"/><ellipse cx="34" cy="27" rx="2.3" ry="1.5" fill="#FF7A5E" opacity=".85"/><g class="p-car"><path d="M2.4 36.4 Q2.4 31.4 7.8 31.4 L33 31.4 Q44.6 32.4 46 39.6 Q46.2 43.2 42 43.2 L7.8 43.2 Q2.4 43.2 2.4 38.4Z" fill="#FFFFFF" stroke="#14152B" stroke-width="2.2" stroke-linejoin="round"/><path d="M3.6 38.2 H45.4" fill="none" stroke="#0A84B8" stroke-width="2.4"/><circle cx="12.6" cy="44.6" r="2.6" fill="#14152B"/><circle cx="34" cy="44.6" r="2.6" fill="#14152B"/></g></svg>`;
+const localDay=(t,id)=>Math.floor((t+SPOT_TZ[id]*36e5)/864e5);
 const spotName=id=>id==="home"?"Honolulu":STOPS.find(s=>s.id===id).name;
+/* Where I am at time t. On a travel day I'm "on" that leg from the morning, waiting at its start until it actually leaves. */
 function tripState(t){
   for(let i=0;i<TRIP.length;i++){const l=TRIP[i];
-    if(t<l.d0)return{p:i,at:l.from,next:l};
-    if(t<l.d1)return{p:i+(t-l.d0)/(l.d1-l.d0),leg:l}}
-  return{p:TRIP.length,at:"home",over:true};
+    if(t<l.d0){const go=localDay(t,l.from)===localDay(l.d0,l.from);return{at:l.from,next:l,on:go?i:null,f:0,wait:go,i}}
+    if(t<l.d1)return{leg:l,on:i,f:(t-l.d0)/(l.d1-l.d0),i}}
+  return{at:"home",over:true,on:null,i:TRIP.length};
 }
-const localDay=(t,id)=>Math.floor((t+SPOT_TZ[id]*36e5)/864e5);
+/* add ?date=2026-11-20 to the address to see the map as it will look on that day (noon, wherever I am by then) */
+const nowT=()=>{const q=new URLSearchParams(location.search).get("date");if(!q)return Date.now();
+  if(/^\d{4}-\d\d-\d\d$/.test(q)){for(const z of [9,8,-10]){const t=Date.parse(`${q}T12:00${z<0?"-":"+"}${String(Math.abs(z)).padStart(2,"0")}:00`),st=tripState(t);if(SPOT_TZ[st.leg?st.leg.from:st.at]===z)return t}}
+  const t=Date.parse(q);return isNaN(t)?Date.now():t};
 function nowText(t,st){
   const left=ms=>{const m=ms/6e4;if(m<50)return`about ${Math.max(5,Math.round(m/5)*5)} minutes`;const h=Math.round(m/60);return h===1?"about an hour":`about ${h} hours`};
   if(st.leg){const l=st.leg,to=spotName(l.to),from=spotName(l.from);
-    return{id:l.to==="home"?"home":l.to,arrow:1,title:l.fly?(l.to==="home"?"In the air, heading home":`In the air to ${to}`):`On the bullet train to ${to}`,
+    return{id:l.to,title:l.fly?(l.to==="home"?"In the air, heading home":`In the air to ${to}`):`On the bullet train to ${to}`,
       sub:l.fly?`Left ${from}, landing in ${left(l.d1-t)}`:`Left ${from}, ${left(l.d1-t)} to go`}}
+  if(st.wait){const l=st.next;return{id:l.to,title:l.to==="home"?"Heading home today":`Off to ${spotName(l.to)} today`,sub:`Still in ${spotName(l.from)}, the ${l.fly?"flight":"bullet train"} leaves later today`}}
   if(st.over)return{id:"home",title:"Back home in Honolulu",sub:"Made it back on Dec 6. Thanks for following along!"};
   if(st.at==="home"){const n=localDay(TRIP[0].d0,"home")-localDay(t,"home");
-    return{id:"home",title:"Still home in Honolulu",sub:n>1?`I leave in ${n} days, on Nov 11`:n===1?"I leave tomorrow, Nov 11":"I fly out today"}}
-  const today=localDay(st.next.d0,st.at)===localDay(t,st.at);
-  return{id:st.at,title:`In ${spotName(st.at)}`,sub:today?`Leaving today on ${st.next.how}`:`Here until ${st.next.day}, then ${st.next.how}`};
+    return{id:"home",title:"Still home in Honolulu",sub:n>1?`I leave in ${n} days, on Nov 11`:"I leave tomorrow, Nov 11"}}
+  return{id:st.at,title:`In ${spotName(st.at)}`,sub:`Here until ${st.next.day}, then ${st.next.how}`};
 }
-const mapUI={legs:[],marks:{},shown:0,ready:false,anim:0};
-function legPts(a,b,bend){const n=bend?40:1,[ax,ay]=a,[bx,by]=b,cx=(ax+bx)/2-(by-ay)*bend,cy=(ay+by)/2+(bx-ax)*bend,pts=[];
+const mapUI={legs:[],marks:{},shown:0,ready:false,anim:0,me:34,P:{}};
+function legPts(a,b,bend){const n=bend?40:8,[ax,ay]=a,[bx,by]=b,cx=(ax+bx)/2-(by-ay)*bend,cy=(ay+by)/2+(bx-ax)*bend,pts=[];
   for(let i=0;i<=n;i++){const t=i/n,u=1-t;pts.push([u*u*ax+2*u*t*cx+t*t*bx,u*u*ay+2*u*t*cy+t*t*by])}return pts}
+const segLens=pts=>pts.slice(1).map((p,i)=>Math.hypot(p[0]-pts[i][0],p[1]-pts[i][1]));
 function partWay(pts,f){ /* the part of a line up to fraction f, and the point it ends on */
   if(f>=1)return{pts,head:pts[pts.length-1]};
-  const seg=[];let tot=0;for(let i=1;i<pts.length;i++){const d=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);seg.push(d);tot+=d}
-  let want=tot*f;const out=[pts[0]];
+  const seg=segLens(pts);let want=seg.reduce((a,b)=>a+b,0)*f;const out=[pts[0]];
   for(let i=0;i<seg.length;i++){if(want>seg[i]){want-=seg[i];out.push(pts[i+1])}else{const k=seg[i]?want/seg[i]:0,h=[pts[i][0]+(pts[i+1][0]-pts[i][0])*k,pts[i][1]+(pts[i+1][1]-pts[i][1])*k];out.push(h);return{pts:out,head:h}}}
   return{pts:out,head:out[out.length-1]};
 }
+/* how far along a line (as a fraction) you have to go before you are left of x or above y: used to step clear of the Honolulu tag */
+function clearOf(pts,x,y){const seg=segLens(pts),tot=seg.reduce((a,b)=>a+b,0);let run=0;
+  for(let i=0;i<pts.length;i++){if(pts[i][0]<x||pts[i][1]<y)return Math.min(.6,run/tot);run+=seg[i]||0}return .6}
 const dOf=pts=>"M"+pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join("L");
 const pct=(v,of)=>(v/of*100).toFixed(2)+"%";
+/* progress along the whole trip, as the map shows it: whole numbers are places, the fraction is how far along a leg */
+function showP(st){if(st.on==null)return st.i;const L=mapUI.legs[st.on];return st.on+L.a+(L.b-L.a)*st.f}
 function buildMap(){
   const card=document.getElementById("map-card"); if(!card)return;
   const marks=document.getElementById("m-marks");
   marks.innerHTML=ROUTE.map(id=>{const s=STOPS.find(x=>x.id===id);
     return `<button type="button" class="mk ${id} ${SPOT_LB[id]}" data-open="${id}" aria-haspopup="dialog" aria-label="${esc(s.name)}, ${SPOT_WHEN[id].replace(" – "," to ")}: open the details"><i class="dot"></i><span class="lb"><b>${esc(s.name)}</b><small>${SPOT_WHEN[id]}</small></span></button>`}).join("")
-    +`<div class="mk-home" id="mk-home"><i></i>Honolulu<small></small></div><div class="m-me" id="m-me"></div>`;
+    +`<div class="mk-home" id="mk-home">Honolulu<small>3,800 miles that way</small></div><div class="m-me" id="m-me" aria-hidden="true"><div class="me-in">${ME_SVG}</div></div>`;
   ROUTE.forEach(id=>mapUI.marks[id]=marks.querySelector(".mk."+id));
+  const km=document.getElementById("k-me");if(km)km.innerHTML=ME_SVG;
   marks.addEventListener("click",e=>{const b=e.target.closest("[data-open]");if(b)openDetail(b.dataset.open)});
   const g=document.getElementById("m-legs");
-  TRIP.forEach(()=>{const todo=el("path",{class:"lg todo"},g),done=el("path",{class:"lg done"},g);mapUI.legs.push({todo,done,pts:[]})});
+  TRIP.forEach(l=>{const mk=c=>{const a=[el("path",{class:`lg ${c} ${l.fly?"fly":"rail"}`},g)];if(!l.fly)a.push(el("path",{class:`lg ${c} ties`},g));return a};
+    mapUI.legs.push({todo:mk("todo"),done:mk("done"),pts:[],a:0,b:1})});
+  const fresh=()=>showP(tripState(nowT()));
   layoutMap();
-  if("ResizeObserver" in window)new ResizeObserver(()=>{layoutMap();paintMap(mapUI.shown,!mapUI.anim)}).observe(card);
-  const st=tripState(nowT()); writeNow(st);
-  const show=()=>{mapUI.ready=true;runTo(tripState(nowT()).p)};
-  if(REDUCED||!("IntersectionObserver" in window)){mapUI.ready=true;paintMap(st.p,true)}
-  else{paintMap(0,false);const io=new IntersectionObserver(es=>{if(es.some(x=>x.isIntersecting)){io.disconnect();show()}},{threshold:.35});io.observe(card)}
-  const tick=()=>{const s=tripState(nowT());writeNow(s);if(mapUI.ready&&!mapUI.anim)paintMap(s.p,true)};
+  if("ResizeObserver" in window)new ResizeObserver(()=>{layoutMap();if(!mapUI.anim)paintMap(mapUI.ready?fresh():0,mapUI.ready)}).observe(card);
+  writeNow(tripState(nowT()));
+  if(REDUCED||!("IntersectionObserver" in window)){mapUI.ready=true;paintMap(fresh(),true)}
+  else{paintMap(0,false);const io=new IntersectionObserver(es=>{if(es.some(x=>x.isIntersecting)){io.disconnect();mapUI.ready=true;runTo(fresh)}},{threshold:.35});io.observe(card)}
+  const tick=()=>{writeNow(tripState(nowT()));if(mapUI.ready&&!mapUI.anim)paintMap(fresh(),true)};
   if(location.hash==="#map")requestAnimationFrame(()=>document.getElementById("map").scrollIntoView({behavior:"auto"}));
   setInterval(tick,60000); document.addEventListener("visibilitychange",()=>{if(!document.hidden)tick()});
 }
 function layoutMap(){
-  const card=document.getElementById("map-card"),s=card.clientWidth/MAPW||1,P={};
+  const card=document.getElementById("map-card"),w=card.clientWidth||MAPW,s=w/MAPW,P={};
+  const me=mapUI.me=Math.round(Math.min(48,Math.max(36,w*.05))); card.style.setProperty("--me",me+"px");
   for(const k in SPOT)P[k]=SPOT[k].slice();
   /* Narita and Tokyo are 40 miles apart, closer than two dots can sit on a phone: ease Narita out along its true bearing */
   const dx=P.narita[0]-P.tokyo[0],dy=P.narita[1]-P.tokyo[1],d=Math.hypot(dx,dy),min=17/s;
   if(d<min){P.narita=[P.tokyo[0]+dx/d*min,P.tokyo[1]+dy/d*min]}
   mapUI.P=P;
-  TRIP.forEach((l,i)=>{const L=mapUI.legs[i];L.pts=legPts(P[l.from],P[l.to],l.bend);L.todo.setAttribute("d",dOf(L.pts))});
   ROUTE.forEach(id=>{const m=mapUI.marks[id];m.style.left=pct(P[id][0],MAPW);m.style.top=pct(P[id][1],MAPH)});
-  document.getElementById("mk-home").style.top=pct(P.home[1],MAPH);
+  const home=document.getElementById("mk-home");home.style.top=pct(P.home[1],MAPH);
+  const tagX=(home.offsetLeft-4)/s,tagY=(home.offsetTop-home.offsetHeight/2-4)/s; /* left of or above these, a line has come out from under the Honolulu tag */
+  TRIP.forEach((l,i)=>{const L=mapUI.legs[i];L.pts=legPts(P[l.from],P[l.to],l.bend);const d=dOf(L.pts);L.todo.forEach(e=>e.setAttribute("d",d));
+    const len=segLens(L.pts).reduce((a,b)=>a+b,0),city=Math.min(.38,me*.8/(len*s));
+    L.a=l.from==="home"?clearOf(L.pts,tagX,tagY):city; L.b=1-(l.to==="home"?clearOf(L.pts.slice().reverse(),tagX,tagY):city)});
 }
 function paintMap(p,settled){
-  mapUI.shown=p; const me=document.getElementById("m-me"),home=document.getElementById("mk-home");
-  let head=null;
-  mapUI.legs.forEach((L,i)=>{const f=Math.min(1,Math.max(0,p-i));
-    if(f<=0){L.done.setAttribute("d","");return}
-    const w=partWay(L.pts,f);L.done.setAttribute("d",dOf(w.pts));if(f<1)head=w.head});
-  ROUTE.forEach((id,i)=>{const m=mapUI.marks[id],here=settled&&p===i+1;
+  mapUI.shown=p; const card=document.getElementById("map-card"),me=document.getElementById("m-me"),home=document.getElementById("mk-home"),s=(card.clientWidth||MAPW)/MAPW;
+  let head=null,on=-1;
+  mapUI.legs.forEach((L,i)=>{const f=Math.min(1,Math.max(0,p-i));let d="";
+    if(f>0){const w=partWay(L.pts,f);d=dOf(w.pts);if(f<1){head=w.head;on=i}}
+    L.done.forEach(e=>e.setAttribute("d",d))});
+  const k=Math.round(p),atHome=!head&&(k===0||k===TRIP.length);
+  ROUTE.forEach((id,i)=>{const m=mapUI.marks[id],here=settled&&!head&&k===i+1;
     m.classList.toggle("seen",p>=i+1);m.classList.toggle("here",here);
     m.querySelector("small").textContent=here?"I'm here now":SPOT_WHEN[id]});
-  const atHome=settled&&(p===0||p===TRIP.length);
-  home.classList.toggle("here",atHome);home.querySelector("small").textContent=atHome?"I'm here now":"3,800 miles that way";
-  me.classList.toggle("on",!!head);me.classList.toggle("run",!settled);
-  if(head){me.style.left=pct(head[0],MAPW);me.style.top=pct(head[1],MAPH)}
+  home.classList.toggle("here",settled&&atHome);home.querySelector("small").textContent=settled&&atHome?"I'm here now":"3,800 miles that way";
+  /* the little guy: riding the leg, standing on the Honolulu tag, or standing by a city */
+  let x,y,mode="walk",flip=false;
+  if(head){[x,y]=head;const l=TRIP[on];mode=l.fly?"fly":"rail";flip=mapUI.P[l.to][0]<mapUI.P[l.from][0]}
+  else if(atHome){x=(home.offsetLeft+mapUI.me*.62)/s;y=(home.offsetTop-home.offsetHeight/2+3)/s}
+  else{const id=ROUTE[k-1];x=mapUI.P[id][0]+(SPOT_ME[id]||0)*mapUI.me/s;y=mapUI.P[id][1]+3/s}
+  me.className="m-me on "+mode+(flip?" flip":"")+(settled?"":" run");me.style.left=pct(x,MAPW);me.style.top=pct(y,MAPH);
 }
-function runTo(target){ /* draw the line from the start of the trip up to where I am */
+function runTo(fresh){ /* draw the line from the start of the trip up to where I am, with the little guy riding the front of it */
+  const target=fresh();
   if(REDUCED||target<=0){paintMap(target,true);return}
-  const T=Math.min(3600,900+target*520),t0=performance.now(),ease=k=>k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
-  const step=now=>{const k=Math.min(1,(now-t0)/T);if(k<1){paintMap(target*ease(k),false);mapUI.anim=requestAnimationFrame(step)}else{mapUI.anim=0;paintMap(target,true)}};
+  const T=Math.min(4200,1000+target*560),t0=performance.now(),ease=k=>k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+  const step=now=>{const k=Math.min(1,(now-t0)/T);if(k<1){paintMap(target*ease(k),false);mapUI.anim=requestAnimationFrame(step)}else{mapUI.anim=0;paintMap(fresh(),true)}};
   mapUI.anim=requestAnimationFrame(step);
 }
 function writeNow(st){
   const t=nowT(),x=nowText(t,st),na=document.getElementById("now-at"),nd=document.getElementById("now-date"),s=STOPS.find(q=>q.id===x.id);
   na.className="now-at "+x.id;
   na.innerHTML=(s?`<span class="cjk-sm" lang="${x.id==="narita"||x.id==="tokyo"?"ja":"zh"}" aria-hidden="true">${s.cjk}</span>`:`<span class="cjk-sm lat" aria-hidden="true">HNL</span>`)+`<div><b>${esc(x.title)}</b><small>${esc(x.sub)}</small></div>`;
-  const on=t>=TRIP[0].d0&&!st.over, where=st.leg?st.leg.to:st.at, day=Math.min(TRIP_DAYS,Math.max(1,localDay(t,where)-DAY1/864e5+1));
+  const on=(st.wait||t>=TRIP[0].d0)&&!st.over, where=st.leg?st.leg.to:st.at, day=Math.min(TRIP_DAYS,Math.max(1,localDay(t,where)-DAY1/864e5+1));
   nd.textContent=on?`Day ${day} of ${TRIP_DAYS}`:new Date(t).toLocaleDateString("en-US",{month:"short",day:"numeric"});
 }
 renderChapters2(); buildBoard(); buildSlides(); buildMap(); reveals();
