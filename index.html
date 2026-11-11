@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!doctype html><html lang="en"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Brenner Abroad</title>
 <meta name="description" content="I'm off to Japan and China, Nov 11 to Dec 6. Follow along and see where I am right now.">
 <meta property="og:type" content="website">
@@ -246,8 +246,17 @@
   @media (max-width:600px){.now{padding-block:40px 22px}.now-at .cjk-sm{font-size:28px}.now-at .cjk-sm.lat{font-size:24px}.mk .dot{width:12px;height:12px;margin:-6px;border-width:2.5px}.m-ctry{display:none}.mk-home{padding:6px 8px 6px 10px}}
   
 
+  /* ---------- Instagram link under the map ---------- */
+  .ig{display:flex;align-items:center;gap:14px;margin:24px 0 0;padding:13px 16px;background:var(--surface);border:1px solid var(--line);border-radius:12px;color:var(--ink);text-decoration:none;transition:border-color .2s,transform .2s}
+  .ig:hover{border-color:var(--ink-3);transform:translateY(-1px)}
+  .ig svg{flex:none;width:36px;height:36px;color:var(--narita)}
+  .ig b{display:block;font-family:var(--f-display);font-weight:800;text-transform:uppercase;font-size:clamp(21px,3.2vw,26px);letter-spacing:.02em;line-height:1}
+  .ig small{display:block;margin-top:4px;font-size:14.5px;line-height:1.35;color:var(--ink-2)}
+  .ig .go{margin-left:auto;font-size:22px;color:var(--ink-3)}
+  @media (prefers-reduced-motion:reduce){.ig{transition:none}.ig:hover{transform:none}}
   /* mobile route strip */
   .strip{display:none}
+  .strip:empty{display:none!important}
   @media (max-width:1000px){
     .strip{display:flex;position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line);margin:22px calc(-1*max(16px,env(safe-area-inset-left,0px))) 0;padding:8px max(16px,env(safe-area-inset-left,0px));gap:4px;overflow-x:auto}
     .strip button{flex:1 0 auto;border:0;background:transparent;font-family:var(--f-display);font-weight:800;text-transform:uppercase;font-size:15px;letter-spacing:.03em;color:var(--ink-3);padding:6px 8px;border-bottom:3px solid transparent;cursor:pointer}
@@ -449,6 +458,11 @@ PS: if I get kidnapped use this to find me pls &lt;3<!--/intro--></p>
       <span><i class="k-me" id="k-me" aria-hidden="true"></i>Me</span>
       <em>The faded lines are still to come. Tap a city for more.</em>
     </p>
+    <a class="ig" href="https://www.instagram.com/kuxiaotudou/" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5.2"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.3" cy="6.7" r=".6" fill="currentColor"/></svg>
+      <span><b>Photos as I go</b><small>I'm posting on Instagram too: @kuxiaotudou</small></span>
+      <span class="go" aria-hidden="true">→</span>
+    </a>
   </div>
 </section>
 
@@ -489,7 +503,7 @@ const STOPS = [
  {id:"shanghai", cjk:"上海", name:"Shanghai", dates:"Fri Nov 13 – Thu Nov 19", nights:"6 nights", short:"6 nights",
   hero:"shanghai-skyline",
   lede:"Six nights in Shanghai. I'm coming in from the airport on the maglev at 300 km/h, which I've wanted to ride for years. Mornings I want to find the parks where people dance and sing, and afternoons I'll wander the old French Concession under the plane trees.",
-  stay:{name:"Desti Youth Hostel", zh:"Jing'an Temple · Metro Line 2", facts:"6 nights", price:"", status:"ok"},
+  stay:{name:"Desti Youth Hostel", zh:"Jing'an · Changping Road, Metro Line 7", facts:"6 nights", price:"", status:"ok"},
   home:{lat:31.2229,lon:121.4462},
   stations:[{n:"Jing'an Temple · Lines 2, 7, 14",lat:31.2236,lon:121.4478}],
   legs:["<b>In</b> ✈ Pudong 17:35 Fri → maglev → Line 2", "<b>Out</b> 🚄 Hongqiao 08:55 → Xi'an 14:34, Thu Nov 19"],
