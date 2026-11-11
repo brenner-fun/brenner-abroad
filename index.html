@@ -246,6 +246,21 @@
   @media (max-width:600px){.now{padding-block:40px 22px}.now-at .cjk-sm{font-size:28px}.now-at .cjk-sm.lat{font-size:24px}.mk .dot{width:12px;height:12px;margin:-6px;border-width:2.5px}.m-ctry{display:none}.mk-home{padding:6px 8px 6px 10px}}
   
 
+  /* ---------- live status: a pill under the title, a flag on the city cards, my local time ---------- */
+  @keyframes herePulse{0%{box-shadow:0 0 0 0 rgba(91,227,161,.75)}70%{box-shadow:0 0 0 9px rgba(91,227,161,0)}100%{box-shadow:0 0 0 0 rgba(91,227,161,0)}}
+  .pip{flex:none;width:9px;height:9px;border-radius:50%;background:var(--board-ok);animation:herePulse 2.2s infinite}
+  .hero-now{position:relative;z-index:1;display:inline-flex;align-items:center;gap:10px;max-width:calc(100% - 32px);margin-top:-4px;padding:9px 14px 9px 13px;border-radius:999px;background:rgba(14,11,9,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.38);color:#FFFFFF;text-decoration:none;font-size:15px;font-weight:600;line-height:1.2;transition:background .2s}
+  .hero-now[hidden]{display:none}
+  .hero-now:hover{background:rgba(14,11,9,.78)}
+  .hero-now .go{font-family:var(--f-mono);font-size:11.5px;font-weight:400;opacity:.85;white-space:nowrap;padding-left:10px;border-left:1px solid rgba(255,255,255,.3)}
+  .ch-flag{position:absolute;z-index:1;top:16px;left:16px;display:none;align-items:center;gap:8px;padding:7px 12px 7px 10px;border-radius:999px;font-size:13.5px;font-weight:700;line-height:1;background:#FFFFFF;color:#14152B;box-shadow:0 4px 18px rgba(0,0,0,.35)}
+  .ch-flag .pip{background:#0E9F6E}
+  .chapter.here .ch-flag,.chapter.done .ch-flag{display:inline-flex}
+  .chapter.done .ch-flag{background:rgba(14,11,9,.5);color:#FFFFFF;font-weight:600;box-shadow:none;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.4);padding:7px 12px}
+  .chapter.done .ch-flag .pip{display:none}
+  .chapter.done .ch-img{filter:grayscale(.85) brightness(.8)}
+  .now-at small.clock{font-family:var(--f-mono);font-size:12px;color:var(--ink-3);margin-top:6px}
+  @media (prefers-reduced-motion:reduce){.pip{animation:none}.hero-now{transition:none}}
   /* ---------- Instagram link under the map ---------- */
   .ig{display:flex;align-items:center;gap:14px;margin:24px 0 0;padding:13px 16px;background:var(--surface);border:1px solid var(--line);border-radius:12px;color:var(--ink);text-decoration:none;transition:border-color .2s,transform .2s}
   .ig:hover{border-color:var(--ink-3);transform:translateY(-1px)}
@@ -405,6 +420,7 @@
 <header class="hero solari">
   <div class="slides" id="slides" aria-hidden="true"></div>
   <h1 class="hero-title">Brenner <wbr>Abroad</h1>
+  <a class="hero-now" id="hero-now" href="#map" hidden><i class="pip" aria-hidden="true"></i><span id="hero-now-t"></span><span class="go">Map ↓</span></a>
   <div class="inner gut">
     <div class="sol-house">
       <div class="sol-head"><span class="plate">Departures</span></div>
@@ -750,6 +766,7 @@ function renderChapters2(){
       <img class="ch-img" src="photos/${s.hero}.jpg" alt="" loading="lazy">
       <span class="ch-kanji" lang="${s.id==="narita"||s.id==="tokyo"?"ja":"zh"}" aria-hidden="true">${s.cjk}</span>
       <span class="ch-meta"><h2 id="h-${s.id}">${esc(s.name)}</h2><span class="when">${esc(s.dates)}</span></span>
+      <span class="ch-flag" aria-hidden="true"></span>
       <span class="ch-more" aria-hidden="true">+</span>
     </button></section>`).join("");
   host.addEventListener("click",e=>{const b=e.target.closest("[data-open]");if(b)openDetail(b.dataset.open)});
@@ -851,6 +868,7 @@ function buildMap(){
   if(REDUCED||!("IntersectionObserver" in window)){mapUI.ready=true;paintMap(fresh(),true)}
   else{paintMap(0,false);const io=new IntersectionObserver(es=>{if(es.some(x=>x.isIntersecting)){io.disconnect();mapUI.ready=true;runTo(fresh)}},{threshold:.35});io.observe(card)}
   const tick=()=>{writeNow(tripState(nowT()));if(mapUI.ready&&!mapUI.anim)paintMap(fresh(),true)};
+  const hn=document.getElementById("hero-now");if(hn)hn.addEventListener("click",e=>{e.preventDefault();document.getElementById("map").scrollIntoView({behavior:REDUCED?"auto":"smooth"})});
   if(location.hash==="#map")requestAnimationFrame(()=>document.getElementById("map").scrollIntoView({behavior:"auto"}));
   setInterval(tick,60000); document.addEventListener("visibilitychange",()=>{if(!document.hidden)tick()});
 }
@@ -894,10 +912,25 @@ function runTo(fresh){ /* draw the line from the start of the trip up to where I
   const step=now=>{const k=Math.min(1,(now-t0)/T);if(k<1){paintMap(target*ease(k),false);mapUI.anim=requestAnimationFrame(step)}else{mapUI.anim=0;paintMap(fresh(),true)}};
   mapUI.anim=requestAnimationFrame(step);
 }
+/* my local time, so people know when to text. Not shown in the air (between time zones) or once I'm home. */
+function myClock(t,st){
+  if(st.over||(st.leg&&st.leg.fly))return"";
+  const id=st.leg?st.leg.from:st.at; if(id==="home"&&!st.wait)return"";
+  const d=new Date(t+SPOT_TZ[id]*36e5),h=d.getUTCHours();
+  return`It's ${h%12||12}:${String(d.getUTCMinutes()).padStart(2,"0")} ${h<12?"am":"pm"} ${["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][d.getUTCDay()]} for me`;
+}
 function writeNow(st){
   const t=nowT(),x=nowText(t,st),na=document.getElementById("now-at"),nd=document.getElementById("now-date"),s=STOPS.find(q=>q.id===x.id);
   na.className="now-at "+x.id;
-  na.innerHTML=(s?`<span class="cjk-sm" lang="${x.id==="narita"||x.id==="tokyo"?"ja":"zh"}" aria-hidden="true">${s.cjk}</span>`:`<span class="cjk-sm lat" aria-hidden="true">HNL</span>`)+`<div><b>${esc(x.title)}</b><small>${esc(x.sub)}</small></div>`;
+  na.innerHTML=(s?`<span class="cjk-sm" lang="${x.id==="narita"||x.id==="tokyo"?"ja":"zh"}" aria-hidden="true">${s.cjk}</span>`:`<span class="cjk-sm lat" aria-hidden="true">HNL</span>`)+`<div><b>${esc(x.title)}</b><small>${esc(x.sub)}</small>${myClock(t,st)?`<small class="clock">${esc(myClock(t,st))}</small>`:""}</div>`;
+  /* the same status as a pill under the title, so nobody has to scroll to the bottom to find it */
+  const hn=document.getElementById("hero-now");if(hn){document.getElementById("hero-now-t").textContent=x.title;hn.hidden=false}
+  /* and on the city cards: a flag on the one I'm in, the ones I've left go grey */
+  STOPS.forEach((c,k)=>{const sec=document.getElementById(c.id);if(!sec)return;
+    const here=!st.leg&&!st.over&&k===st.i-1, done=st.leg?k<=st.i-1:k<st.i-1, flag=sec.querySelector(".ch-flag"), btn=sec.querySelector(".ch-open");
+    sec.classList.toggle("here",here);sec.classList.toggle("done",done);
+    if(flag)flag.innerHTML=here?`<i class="pip"></i>I'm here now`:done?"Been here ✓":"";
+    if(btn)btn.setAttribute("aria-label",`${c.name}${here?", I'm here now":done?", been here":""}: open the details`)});
   const on=(st.wait||t>=TRIP[0].d0)&&!st.over, where=st.leg?st.leg.to:st.at, day=Math.min(TRIP_DAYS,Math.max(1,localDay(t,where)-DAY1/864e5+1));
   nd.textContent=on?`Day ${day} of ${TRIP_DAYS}`:new Date(t).toLocaleDateString("en-US",{month:"short",day:"numeric"});
 }
